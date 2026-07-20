@@ -1,0 +1,26 @@
+generated: '2026-07-17'
+method: searched
+source: openapi/aito-technologies-openapi-original.yml
+docs: https://aito.ai/docs/api/
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+  key_types:
+  - read-only
+  - read/write
+  env_vars:
+  - AITO_INSTANCE_URL
+  - AITO_API_KEY
+schemes:
+- name: ApiKeyAuth
+  type: apiKey
+  in: header
+  parameter: x-api-key
+  key_types:
+  - read-only
+  - read/write
+  docs: https://aito.ai/docs/api/
+  sources:
+  - openapi/aito-technologies-openapi-original.yml
