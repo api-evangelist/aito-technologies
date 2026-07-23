@@ -1,24 +1,162 @@
 aid: aito-technologies
 name: Aito Technologies
-description: 'Aito Technologies is a company surfaced as a portfolio company of creandum and added to
-  the API Evangelist network as a stub for enrichment. Sector: other. This profile is a lead awaiting
-  the enrichment pipeline.'
+description: 'Aito Technologies (Aito.ai, legal entity Episto Oy of Vantaa, Finland)
+  builds a predictive database that delivers instant, calibrated machine-learning predictions
+  from live business data with no model training. Its REST Query API exposes a SQL-like
+  JSON interface for prediction, recommendation, similarity search, classification, pattern
+  matching, and statistical relation over your own tables, alongside schema and data-management
+  endpoints. Aito powers predictive accounting (GL coding, invoice routing, fraud detection),
+  predictive ERP, and predictive e-commerce, and is delivered as an EU-hosted cloud service
+  (Ireland, eu-west-1) or a self-hosted Docker container. Authentication is an x-api-key
+  header with read-only and read/write key types.'
 url: https://raw.githubusercontent.com/api-evangelist/aito-technologies/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - creandum
-x-tier: stub
+x-tier: enriched
 x-tier-reason: portfolio-lead
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
 specificationVersion: '0.20'
 created: '2026-07-17'
 modified: '2026-07-17'
+image: https://console.aito.ai/aito-favicon-128.png
 tags:
 - Company
-- Other
-apis: []
+- Predictive Database
+- Machine Learning
+- Artificial Intelligence
+- Recommendations
+- Search
+- Predictive Analytics
+- Automation
+- Data
+apis:
+- aid: aito-technologies:aito-technologies-data-api
+  name: Aito Technologies data API
+  description: The data API from Aito Technologies — 7 operation(s) for data.
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - data
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-data-api-openapi.yml
+  - type: Swagger
+    url: https://aito.ai/docs/api/
+  - type: Authentication
+    url: authentication/aito-technologies-authentication.yml
+- aid: aito-technologies:aito-technologies-query-api
+  name: Aito Technologies query API
+  description: The query API from Aito Technologies — 15 operation(s) for query.
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - query
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-query-api-openapi.yml
+  - type: Swagger
+    url: https://aito.ai/docs/api/
+  - type: Authentication
+    url: authentication/aito-technologies-authentication.yml
+- aid: aito-technologies:aito-technologies-schema-api
+  name: Aito Technologies schema API
+  description: The schema API from Aito Technologies — 5 operation(s) for schema.
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - schema
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-schema-api-openapi.yml
+  - type: Swagger
+    url: https://aito.ai/docs/api/
+  - type: Authentication
+    url: authentication/aito-technologies-authentication.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+common:
+- type: Authentication
+  url: authentication/aito-technologies-authentication.yml
+- type: DomainSecurity
+  url: security/aito-technologies-domain-security.yml
+- type: Conventions
+  url: conventions/aito-technologies-conventions.yml
+- type: ErrorCatalog
+  url: errors/aito-technologies-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/aito-technologies-lifecycle.yml
+- type: StatusPage
+  url: https://aitostatus.statuspage.io
+- type: MCPServer
+  url: mcp/aito-technologies-mcp.yml
+- type: LLMsTxt
+  url: llms/aito-technologies-llms.txt
+- type: Packages
+  url: packages/aito-technologies-packages.yml
+- type: SDKs
+  url: packages/aito-technologies-packages.yml
+- type: CLI
+  url: cli/aito-technologies-cli.yml
+- type: Conformance
+  url: conformance/aito-technologies-conformance.yml
+- type: Compliance
+  url: https://aito.ai/trust/security/
+- type: TrustCenter
+  url: https://aito.ai/trust/
+- type: DataModel
+  url: data-model/aito-technologies-data-model.yml
+- type: Overlay
+  url: overlays/aito-technologies-openapi-overlay.yaml
+- type: AgenticAccess
+  url: agentic-access/aito-technologies-agentic-access.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Sandbox
+  url: sandbox/aito-technologies-sandbox.yml
+- type: ChangeLog
+  url: https://aito.releasenotes.io/
+- type: DeveloperPortal
+  url: https://aito.ai/docs/
+- type: Documentation
+  url: https://aito.ai/docs/
+- type: APIReference
+  url: https://aito.ai/docs/api/
+- type: GettingStarted
+  url: https://aito.ai/docs/
+- type: Support
+  url: https://aito.ai/join-slack/
+- type: Blog
+  url: https://aito.ai/blog/
+- type: GitHubOrganization
+  url: https://github.com/AitoDotAI
+- type: Pricing
+  url: https://aito.ai/pricing/
+- type: SignUp
+  url: https://console.aito.ai/account/authentication/?signUp=true
+- type: TermsOfService
+  url: https://aito.ai/terms-of-service/
+- type: PrivacyPolicy
+  url: https://aito.ai/privacy-policy/
+- type: Website
+  url: https://aito.ai
+x-enrichment:
+  date: '2026-07-19'
+  status: backfilled
+  pass: local-v1
+  note: backfilled from .gitignore signal + verified work evidence

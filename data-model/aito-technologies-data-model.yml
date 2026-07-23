@@ -1,0 +1,56 @@
+generated: '2026-07-17'
+method: derived
+source: openapi/aito-technologies-openapi-original.yml
+notes: >-
+  Aito is a schema-on-your-own-data predictive database: the domain entities are
+  user-defined Tables and Columns rather than fixed platform objects. The graph
+  below is derived from the schema/data/jobs endpoints in the OpenAPI.
+entities:
+- name: DatabaseSchema
+  description: The provisioned schema for an Aito instance/database.
+  endpoints:
+  - GET /api/v1/schema
+  - PUT /api/v1/schema
+  - DELETE /api/v1/schema
+- name: Table
+  description: A user-defined table (UserDefinedTableSchema) of typed columns.
+  endpoints:
+  - GET /api/v1/schema/{table}
+  - PUT /api/v1/schema/{table}
+  - DELETE /api/v1/schema/{table}
+  - POST /api/v1/schema/_rename
+  - POST /api/v1/schema/_copy
+- name: Column
+  description: A typed column (ColumnType — Int/Decimal/Boolean/String/Text/Json/Array) with an optional Analyzer.
+  endpoints:
+  - GET /api/v1/schema/{table}/{column}
+  - PUT /api/v1/schema/{table}/{column}
+  - DELETE /api/v1/schema/{table}/{column}
+- name: Row
+  description: A data record inside a table; created/modified/deleted via data operations and queried via the predictive operations.
+  endpoints:
+  - POST /api/v1/data/_modify
+  - POST /api/v1/data/_delete
+  - POST /api/v1/_search
+  - POST /api/v1/_query
+- name: Job
+  description: An asynchronous processing job (e.g. batch file upload) with a status response.
+  endpoints:
+  - file-upload / batch-import jobs (FileUploadProcessTriggerResponse, JobsStatusResponse)
+relationships:
+- from: DatabaseSchema
+  type: has_many
+  to: Table
+  via: columns/tables map
+- from: Table
+  type: has_many
+  to: Column
+  via: columns
+- from: Table
+  type: has_many
+  to: Row
+  via: table data
+- from: Column
+  type: has_one
+  to: Analyzer
+  via: analyzer

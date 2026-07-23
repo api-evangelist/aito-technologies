@@ -1,0 +1,34 @@
+generated: '2026-07-17'
+method: derived
+source: openapi/aito-technologies-openapi-original.yml
+format: plain
+notes: >-
+  The Aito Query API declares only 200 (success) and 400 (Invalid request body)
+  responses across its 34 operations. Errors are returned as a plain JSON body,
+  not RFC 9457 application/problem+json. The catalog below is derived from the
+  OpenAPI response objects.
+envelope:
+  content_type: application/json
+  problem_details: false
+problems:
+- status: 400
+  title: Invalid request body
+  description: >-
+    The request JSON did not validate against the operation's expected query or
+    payload shape (bad table/column reference, malformed where/predict/recommend
+    clause, unsupported field, or payload exceeding the 10MB limit).
+  applies_to_operations:
+  - search
+  - predict
+  - recommend
+  - similarity
+  - match
+  - relate
+  - query
+  - aggregate
+  - estimate
+  - evaluate
+  - batch
+  - modify
+  - delete
+  source_operation: openapi/aito-technologies-openapi-original.yml

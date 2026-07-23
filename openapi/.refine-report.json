@@ -1,0 +1,22 @@
+{
+  "provider": "aito-technologies",
+  "sources": [
+    "aito-technologies-data-api-openapi.yml",
+    "aito-technologies-query-api-openapi.yml",
+    "aito-technologies-schema-api-openapi.yml"
+  ],
+  "outputs": [
+    "aito-technologies-data-api-openapi.yml",
+    "aito-technologies-query-api-openapi.yml",
+    "aito-technologies-schema-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [
+    "aito-technologies-data-api-openapi.yml: info.version missing",
+    "aito-technologies-query-api-openapi.yml: info.version missing",
+    "aito-technologies-schema-api-openapi.yml: info.version missing"
+  ],
+  "notes": [],
+  "skipped": []
+}

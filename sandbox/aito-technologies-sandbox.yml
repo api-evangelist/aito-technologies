@@ -1,0 +1,24 @@
+generated: '2026-07-17'
+method: searched
+source: https://aito.ai/docs/
+free_tier:
+  name: Development tier
+  limits:
+    rows_per_table: 10000
+    rows_total: 50000
+  notes: Free development instances for building and testing before production licensing.
+demo:
+  database: aito-demo
+  instance_host: https://shared.aito.ai
+  api_base: https://shared.aito.ai/db/aito-demo/api/v1
+  console_workbook: https://console.aito.ai/databases/aito-demo/workbooks
+  notes: Public shared demo database used throughout the docs/quickstart examples.
+key_types:
+- read-only
+- read/write
+notes: >-
+  Aito separates read-only and read/write API keys per instance. No published
+  "magic" test values (test cards/identifiers) exist — this is a predictive
+  database over the customer's own uploaded data, so the sandbox is the free
+  development instance plus the shared aito-demo database. No fabricated test
+  credentials are recorded here.

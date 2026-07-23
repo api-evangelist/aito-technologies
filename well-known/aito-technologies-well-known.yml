@@ -1,0 +1,30 @@
+generated: '2026-07-17'
+method: searched
+host: https://aito.ai
+notes: >-
+  Probed the standard /.well-known/ discovery surface on aito.ai, api.aito.ai and
+  console.aito.ai. No real discovery documents were served — aito.ai returns 404
+  for all probed paths, and console.aito.ai returns its SPA HTML shell (a 200
+  soft-404, not a valid RFC 9116 security.txt). No WellKnown/SecurityTxt pointer
+  is wired because nothing valid was found. Absence is a valid, recorded result.
+documents:
+- path: /.well-known/security.txt
+  host: aito.ai
+  status: 404
+- path: /.well-known/openid-configuration
+  host: aito.ai
+  status: 404
+- path: /.well-known/oauth-authorization-server
+  host: aito.ai
+  status: 404
+- path: /.well-known/api-catalog
+  host: aito.ai
+  status: 404
+- path: /.well-known/ai-plugin.json
+  host: aito.ai
+  status: 404
+- path: /.well-known/security.txt
+  host: console.aito.ai
+  status: 200
+  valid: false
+  note: SPA HTML shell (soft-404), not a real security.txt

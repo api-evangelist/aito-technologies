@@ -1,0 +1,353 @@
+# Aito.ai API Documentation
+
+Aito is a database with built-in machine learning capabilities.
+It provides prediction, recommendation, similarity search, and data matching through a REST API.
+
+Base URL: https://your-instance.aito.app
+Authentication: x-api-key header
+
+For full documentation: https://aito.ai/docs/api/
+OpenAPI spec: https://aito.ai/docs/api/openapi.yaml
+
+## API Endpoints
+
+### Query Operations
+
+**POST /api/v1/_search** - Search
+Search rows.
+Example request:
+```json
+{
+  "from": "products",
+  "where": {
+    "id": "6411300000494"
+  }
+}
+```
+
+**POST /api/v1/_predict** - Predict
+Predict the likelihood of a feature given a hypothesis.
+Example request:
+```json
+{
+  "from": "impressions",
+  "where": {
+    "context.user": "larry",
+    "product.id": "6410405216120"
+  },
+  "predict": "purchase"
+}
+```
+
+**POST /api/v1/_recommend** - Recommend
+Recommend a row which optimizes a given goal.
+Example request:
+```json
+{
+  "from": "impressions",
+  "where": {
+    "context.user": "veronica"
+  },
+  "recommend": "product",
+  "goal": {
+    "purchase": true
+  },
+  "limit": 5
+}
+```
+
+**POST /api/v1/_estimate** - Estimate
+Estimate numeric field values using K-NN with transformation pipelines.
+Example request:
+```json
+{
+  "from": "products",
+  "where": {
+    "tags": {
+      "$has": "bread"
+    }
+  },
+  "estimate": "price",
+  "select": [
+    "estimate"
+  ]
+}
+```
+
+**POST /api/v1/_evaluate** - Evaluate
+Evaluate performance and accuracy.
+Example request:
+```json
+{
+  "test": {
+    "$index": {
+      "$mod": [
+        4,
+        0
+      ]
+    }
+  },
+  "evaluate": {
+    "from": "products",
+    "where": {
+      "name": {
+        "$match": {
+          "$get": "name"
+        }
+      }
+    },
+    "predict": "category"
+  }
+}
+```
+
+**POST /api/v1/_similarity** - Similarity
+Similarity can be used to return entries, that are similar to the given sample object.
+Example request:
+```json
+{
+  "from": "products",
+  "similarity": {
+    "category": "108",
+    "id": "6411300000494",
+    "name": "Juhla Mokka coffee 500g sj",
+    "price": 3.95,
+    "tags": [
+      "coffee"
+    ]
+  },
+  "limit": 3
+}
+```
+
+**POST /api/v1/_match** - Match
+Match the most likely value/feature of a column or any column of a linked table to a given hypothesis.
+Example request:
+```json
+{
+  "from": "impressions",
+  "where": {
+    "context.user": "larry"
+  },
+  "match": "product",
+  "limit": 5
+}
+```
+
+**POST /api/v1/_relate** - Relate
+Relate provides statistical information of data relationships.
+Example request:
+```json
+{
+  "from": "impressions",
+  "where": {
+    "$exists": "product"
+  },
+  "relate": [
+    {
+      "purchase": true
+    }
+  ],
+  "limit": 2
+}
+```
+
+**POST /api/v1/_query** - Generic query
+Generic query is a powerful expert interface.
+Example request:
+```json
+{
+  "from": "products",
+  "where": {
+    "id": "6410402010318"
+  }
+}
+```
+
+**POST /api/v1/_batch** - Batch
+Batch query operation.
+Example request:
+```json
+[
+  {
+    "from": "products",
+    "where": {
+      "name": "rye bread"
+    },
+    "predict": "category"
+  },
+  {
+    "from": "products",
+    "where": {
+      "name": "rye bread"
+    },
+    "predict": "tags",
+    "exclusiveness": false
+  },
+  {
+    "from": "products",
+    "similarity": {
+      "name": "rye bread"
+    }
+  }
+]
+```
+
+**POST /api/v1/_aggregate** - Aggregate
+Aggregate operation.
+Example request:
+```json
+{
+  "from": "impressions",
+  "where": {
+    "product.id": "6408180733260"
+  },
+  "aggregate": [
+    "purchase.$sum",
+    "purchase.$mean"
+  ]
+}
+```
+
+**POST /api/v1/jobs/{query}** - Create jobs
+Create a job for queries that last longer than 30 seconds. The regular endpoints reach a timeout after 30 seconds.
+Example request:
+```json
+{
+  "test": {
+    "$index": {
+      "$mod": [
+        4,
+        0
+      ]
+    }
+  },
+  "evaluate": {
+    "from": "products",
+    "where": {
+      "name": {
+        "$match": {
+          "$get": "name"
+        }
+      }
+    },
+    "predict": "category"
+  }
+}
+```
+
+**GET /api/v1/jobs/** - Get status of all jobs
+List all jobs that exist currently.
+
+**GET /api/v1/jobs/{uuid}** - Get status of a job
+If you have started a job for some of the queries, this endpoint can return you the status of the job by its ID.
+
+**GET /api/v1/jobs/{uuid}/result** - Get result of a job
+Get the query result for a created job.
+
+### Data Operations
+
+**GET /api/v1/schema** - Get database schema
+
+**PUT /api/v1/schema** - Create database schema
+
+**DELETE /api/v1/schema** - Delete database
+
+**GET /api/v1/schema/{table}** - Get table schema
+
+**PUT /api/v1/schema/{table}** - Create table schema
+
+**DELETE /api/v1/schema/{table}** - Delete table
+
+**GET /api/v1/schema/{table}/{column}** - Get column schema
+
+**PUT /api/v1/schema/{table}/{column}** - Add or replace column
+
+**DELETE /api/v1/schema/{table}/{column}** - Delete column
+
+**POST /api/v1/schema/_rename** - Rename a table
+
+**POST /api/v1/schema/_copy** - Copy a table
+
+**POST /api/v1/data/{table}** - Insert entry
+
+**POST /api/v1/data/{table}/batch** - Insert multiple entries
+
+**POST /api/v1/data/_modify** - Modify data
+
+**POST /api/v1/data/_delete** - Delete entries
+
+**POST /api/v1/data/{table}/file** - Initiate file upload
+
+**POST /api/v1/data/{table}/file/{uuid}** - Trigger file processing
+
+**GET /api/v1/data/{table}/file/{uuid}** - Get file processing status
+
+**POST /api/v1/data/{table}/optimize** - Optimize the database
+
+## Query Language
+
+Aito uses a JSON-based query language with the following key operators:
+
+### Propositions (WHERE clauses)
+- `{"field": "value"}` - exact match
+- `{"field": {"$has": "value"}}` - contains value (for arrays/text)
+- `{"field": {"$match": "text"}}` - full-text search
+- `{"field": {"$gt": n}}` - greater than
+- `{"field": {"$gte": n}}` - greater than or equal
+- `{"field": {"$lt": n}}` - less than
+- `{"field": {"$lte": n}}` - less than or equal
+- `{"$and": [...]}` - logical AND
+- `{"$or": [...]}` - logical OR
+- `{"$not": {...}}` - logical NOT
+
+### Common Query Parameters
+- `from` - table name to query
+- `where` - filter conditions (proposition)
+- `limit` - max results (default 10)
+- `offset` - skip results for pagination
+- `orderBy` - sort field
+- `select` - fields to return
+
+### Prediction Query
+```json
+{
+  "from": "tableName",
+  "where": {
+    "knownField": "value"
+  },
+  "predict": "targetField"
+}
+```
+
+### Recommendation Query
+```json
+{
+  "from": "tableName",
+  "where": {
+    "context": "value"
+  },
+  "recommend": "itemField",
+  "goal": {
+    "outcomeField": true
+  }
+}
+```
+
+## Data Types
+
+Aito supports the following column types:
+- `String` - text values
+- `Int` - 32-bit integer
+- `Long` - 64-bit integer
+- `Decimal` - floating point
+- `Boolean` - true/false
+- `Text` - analyzed text (for full-text search)
+- `String[]` - array of strings
+- `Int[]` - array of integers
+- `Long[]` - array of 64-bit integers
+- `Decimal[]` - array of decimals
+
+---
+Generated from Aito API documentation
+For the complete OpenAPI specification, see: /openapi.yaml

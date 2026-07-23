@@ -1,0 +1,4333 @@
+openapi: 3.0.0
+info:
+  title: Aito Technologies data query API
+security:
+- ApiKeyAuth: []
+tags:
+- name: query
+paths:
+  /api/v1/jobs/{query}:
+    post:
+      tags:
+      - query
+      parameters:
+      - $ref: '#/components/parameters/Query'
+      description: Create a job for a query
+      responses:
+        200:
+          description: Job info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobsResponse'
+        400:
+          description: Invalid request body
+  /api/v1/jobs/:
+    get:
+      tags:
+      - query
+      description: Get status for all jobs
+      responses:
+        200:
+          description: Job statuses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobsStatusResponse'
+        400:
+          description: Invalid request body
+  /api/v1/jobs/{uuid}:
+    get:
+      tags:
+      - query
+      description: Get status for a job
+      responses:
+        200:
+          description: Job status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobsStatusResponse'
+        400:
+          description: Invalid request body
+  /api/v1/jobs/{uuid}/result:
+    get:
+      tags:
+      - query
+      description: Get result for an evaluate job query
+      responses:
+        200:
+          description: Evaluate job result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluateResponse'
+        400:
+          description: Invalid request body
+  /api/v1/_search:
+    post:
+      tags:
+      - query
+      operationId: search
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchQuery'
+      responses:
+        200:
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_similarity:
+    post:
+      tags:
+      - query
+      operationId: similarity
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SimilarityQuery'
+      responses:
+        200:
+          description: Similarity results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_predict:
+    post:
+      tags:
+      - query
+      operationId: predict
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictQuery'
+      responses:
+        200:
+          description: Predict results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_match:
+    post:
+      tags:
+      - query
+      operationId: match
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MatchQuery'
+      responses:
+        200:
+          description: Match results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_recommend:
+    post:
+      tags:
+      - query
+      operationId: recommend
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecommendQuery'
+      responses:
+        200:
+          description: Recommend results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_relate:
+    post:
+      tags:
+      - query
+      operationId: relate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RelateQuery'
+      responses:
+        200:
+          description: Relate results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_query:
+    post:
+      tags:
+      - query
+      operationId: query
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Query'
+      responses:
+        200:
+          description: Query results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_aggregate:
+    post:
+      tags:
+      - query
+      operationId: aggregate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AggregateQuery'
+      responses:
+        200:
+          description: Aggregate results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DecoratedHits'
+        400:
+          description: Invalid request body
+  /api/v1/_estimate:
+    post:
+      tags:
+      - query
+      operationId: estimate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstimateQuery'
+      responses:
+        200:
+          description: Estimate results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EstimateResult'
+        400:
+          description: Invalid request body
+  /api/v1/_evaluate:
+    post:
+      tags:
+      - query
+      operationId: evaluate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluateQueryBase'
+      responses:
+        200:
+          description: Evaluate results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvaluateResponse'
+        400:
+          description: Invalid request body
+  /api/v1/_batch:
+    post:
+      tags:
+      - query
+      operationId: batch
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchQuery'
+      responses:
+        200:
+          description: Batch results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchQueryResults'
+        400:
+          description: Invalid request body
+components:
+  schemas:
+    Hit:
+      example:
+        $hit: price
+      examples:
+      - $hit: price
+      - $hit: $similarity
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $multiply:
+          - $hit: $similarity
+          - $hit: price
+      type: object
+      properties:
+        $hit:
+          $ref: '#/components/schemas/Score'
+    HighlightProjection:
+      example: $highlight
+      type: string
+      enum:
+      - $highlight
+    SortField:
+      example: $sort
+      type: string
+      enum:
+      - $sort
+    Knn:
+      example:
+        $knn:
+        - 4
+        - tags: laptop
+      examples:
+      - $knn:
+        - 4
+        - tags: laptop
+      - $knn:
+          k: 4
+          near:
+            tags: laptop
+      type: object
+      properties:
+        $knn:
+          oneOf:
+          - $ref: '#/components/schemas/KnnPropositionObject'
+          - $ref: '#/components/schemas/KnnPropositionArray'
+    EvaluateResponse:
+      type: object
+      required:
+      - n
+      - testSamples
+      - trainSamples
+      - features
+      - error
+      - baseError
+      - accuracy
+      - baseAccuracy
+      - accuracyGain
+      - meanRank
+      - baseMeanRank
+      - rankGain
+      - informationGain
+      - mxe
+      - h
+      - geomMeanP
+      - baseGmp
+      - geomMeanLift
+      - meanNs
+      - meanUs
+      - meanMs
+      - medianNs
+      - medianUs
+      - medianMs
+      - warmingMs
+      properties:
+        n:
+          description: 'The amount of samples used for testing. Alias for `testSamples`.
+
+            '
+          type: integer
+          format: int64
+        testSamples:
+          description: 'The amount of samples used for testing.
+
+            '
+          type: integer
+          format: int64
+        trainSamples:
+          description: 'The average amount of samples used for training.
+
+            '
+          type: number
+        features:
+          description: 'The average number of features
+
+            '
+          type: number
+        error:
+          description: 'Complement of `accuracy` (=`1 - accuracy`).
+
+            '
+          type: number
+        baseError:
+          description: 'Complement of `baseAccuracy` (=`1 - baseAccuracy`).
+
+            '
+          type: number
+        accuracy:
+          description: 'The accuracy of predictions.
+
+            '
+          type: number
+        baseAccuracy:
+          description: 'The simulated accuracy of predictions based on taking the most frequent value. This is not the actual Aito accuracy, but useful to understand how much better results Aito can provide.
+
+            '
+          type: number
+        accuracyGain:
+          description: 'How much better results Aito was able to provide compared to a naive prediction. `accuracy - baseAccuracy`.
+
+            '
+          type: number
+        meanRank:
+          description: 'Average rank of the best prediction
+
+            '
+          type: number
+        baseMeanRank:
+          description: ''
+          type: number
+        rankGain:
+          description: 'Improvement of meanRank upon baseMeanRank
+
+            '
+          type: number
+        informationGain:
+          description: 'A measurement which describes the quality of probabilities (=`h - mxe`).
+
+            '
+          type: number
+        mxe:
+          description: 'Mean cross entropy
+
+            '
+          type: number
+        h:
+          description: 'Entropy
+
+            '
+          type: number
+        geomMeanP:
+          description: 'The mean geometric probability of the predictions
+
+            '
+          type: number
+        baseGmp:
+          description: 'Base geometric mean probability.
+
+            '
+          type: number
+        geomMeanLift:
+          description: 'Geometric mean lift. `geomMeanP / baseGmp`
+
+            '
+          type: number
+        meanNs:
+          description: 'The mean execution time of the queries in nanoseconds.
+
+            '
+          type: number
+        meanUs:
+          description: 'The mean execution time of the queries in microseconds.
+
+            '
+          type: number
+        meanMs:
+          description: 'The mean execution time of the queries in milliseconds.
+
+            '
+          type: number
+        medianNs:
+          description: 'The median execution time of the queries in nanoseconds.
+
+            '
+          type: number
+        medianUs:
+          description: 'The median execution time of the queries in microseconds.
+
+            '
+          type: number
+        medianMs:
+          description: 'The median execution time of the queries in milliseconds.
+
+            '
+          type: number
+        warmingMs:
+          description: 'The time spent for warm-up of indexes and caches for the given query in milliseconds.
+
+            '
+          type: number
+    IntArray:
+      example:
+      - 1
+      - 2
+      - 3
+      type: array
+      items:
+        type: integer
+        format: int32
+    AggregateProjection:
+      example: price.$mean
+      oneOf:
+      - $ref: '#/components/schemas/AggregateList'
+      - $ref: '#/components/schemas/AggregateMean'
+      - $ref: '#/components/schemas/AggregateSum'
+      - $ref: '#/components/schemas/AggregateFrequency'
+      - $ref: '#/components/schemas/FrequencyAggregateField'
+      - $ref: '#/components/schemas/AggregateField'
+      - $ref: '#/components/schemas/NamedAggregateProjection'
+    Mod:
+      example:
+        $mod:
+        - 2
+        - 0
+      examples:
+      - $mod:
+        - 2
+        - 0
+      - $mod:
+          divisor: 2
+          remainder: 0
+      - from: products
+        where:
+          price:
+            $mod:
+              divisor: 2
+              remainder: 0
+      type: object
+      properties:
+        $mod:
+          oneOf:
+          - $ref: '#/components/schemas/ModPropositionObject'
+          - $ref: '#/components/schemas/ModPropositionArray'
+    ScoreField:
+      example: $score
+      type: string
+      enum:
+      - $score
+    Hash:
+      example:
+        $hash:
+          $mod:
+          - 2
+          - 1
+      type: object
+      properties:
+        $hash:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    EvaluateGenericQuery:
+      type: object
+      example:
+        from: impressions
+        get: product
+        limit: 20
+        offset: 10
+      required:
+      - from
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          $ref: '#/components/schemas/Proposition'
+        get:
+          example: product
+          $ref: '#/components/schemas/Get'
+        orderBy:
+          $ref: '#/components/schemas/OrderBy'
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          example: 10
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 20
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    Not:
+      example:
+        $not:
+          tags: laptop
+      examples:
+      - $not:
+          tags: laptop
+      - $not:
+          $lt: 0
+      - from: products
+        where:
+          price:
+            $not:
+              $lt: 1.1
+      type: object
+      properties:
+        $not:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    GteExplanation:
+      type: object
+      properties:
+        $gte:
+          oneOf:
+          - $ref: '#/components/schemas/IntArray'
+          - $ref: '#/components/schemas/LongArray'
+          - $ref: '#/components/schemas/DecimalArray'
+          - $ref: '#/components/schemas/StringArray'
+          - $ref: '#/components/schemas/BooleanArray'
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: boolean
+          - type: 'null'
+          - type: string
+          - type: object
+    AndExplanation:
+      type: object
+      properties:
+        $and:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropositionExplanation'
+    AggregateSum:
+      example:
+        $sum: visits
+      examples:
+      - $sum: visits
+      - $sum: purchase
+      type: object
+      properties:
+        $sum:
+          $ref: '#/components/schemas/Score'
+    NnPropositionObject:
+      type: object
+      example:
+        near:
+          tags: laptop
+      required:
+      - near
+      properties:
+        near:
+          example:
+            tags: laptop
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+        threshold:
+          type: number
+    EvaluateNumericOperation:
+      type: object
+      example:
+        estimate: price
+        from: products
+        where:
+          category:
+            $get: category
+      required:
+      - from
+      - estimate
+      properties:
+        from:
+          example: products
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            category:
+              $get: category
+          $ref: '#/components/schemas/Proposition'
+        estimate:
+          example: price
+          type: string
+        basedOn:
+          $ref: '#/components/schemas/PropositionSet'
+    Query:
+      type: object
+      example:
+        from: impressions
+        get: product
+        limit: 20
+        offset: 10
+      required:
+      - from
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          $ref: '#/components/schemas/Proposition'
+        get:
+          example: product
+          $ref: '#/components/schemas/Get'
+        orderBy:
+          $ref: '#/components/schemas/OrderBy'
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          example: 10
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 20
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    HighlightParams:
+      type: object
+      example:
+        encoder: html
+        negPostTag: </em>
+        negPreTag: <em>
+        negThreshold: 0.9
+        posPostTag: </b>
+        posPreTag: <b>
+        posThreshold: 1.1
+      properties:
+        posPreTag:
+          example: <b>
+          type: string
+        posPostTag:
+          example: </b>
+          type: string
+        negPreTag:
+          example: <em>
+          type: string
+        negPostTag:
+          example: </em>
+          type: string
+        posThreshold:
+          example: 1.1
+          type: number
+        negThreshold:
+          example: 0.9
+          type: number
+        encoder:
+          example: html
+          type: string
+    NamedAggregateProjection:
+      example:
+        aggregate:
+          clicks:
+            $f:
+              click: true
+          ctr:
+            $mean: click
+          impressions: $f
+        from: impressions
+        where:
+          product.name: MyProduct
+      examples:
+      - aggregate:
+          clicks:
+            $f:
+              click: true
+          ctr:
+            $mean: click
+          impressions: $f
+        from: impressions
+        where:
+          product.name: MyProduct
+      - failureCount:
+          $f:
+            success: false
+      type: object
+    Hits:
+      example:
+      - $p: 0.16772371915637704
+        category: '100'
+        id: '6410405060457'
+        name: Pirkka bio cherry tomatoes 250g international 1st class
+        price: 1.29
+        tags: fresh vegetable pirkka tomato
+      - $p: 0.16772371915637704
+        category: '100'
+        id: '6410405093677'
+        name: Pirkka iceberg salad Finland 100g 1st class
+        price: 1.29
+        tags: fresh vegetable pirkka
+      type: array
+      items:
+        $ref: '#/components/schemas/ResponseHit'
+    EvaluateGroupedOperation:
+      example:
+        from: impressions
+        goal:
+          purchase: 'true'
+        recommend: product
+        where:
+          product.name:
+            $get: query
+          session.user:
+            $get: session.user
+      examples:
+      - from: impressions
+        goal:
+          purchase: 'true'
+        recommend: product
+        where:
+          product.name:
+            $get: query
+          session.user:
+            $get: session.user
+      - from: impressions
+        get: product
+        orderBy:
+          $p:
+            purchase: true
+        where:
+          product.name:
+            $get: query
+          session.user:
+            $get: session.user
+      oneOf:
+      - $ref: '#/components/schemas/EvaluateMultiGenericQuery'
+      - $ref: '#/components/schemas/EvaluateRecommend'
+    EvaluateGroupedQuery:
+      type: object
+      example:
+        evaluate:
+          from: impressions
+          goal:
+            purchase: 'true'
+          recommend: product
+          where:
+            product.name:
+              $get: query
+            session.user:
+              $get: session.user
+        group: userGroup
+        select:
+        - accuracy
+        - meanRank
+        - n
+        test:
+          userGroup:
+            $gte: 5
+      required:
+      - group
+      - evaluate
+      properties:
+        train:
+          $ref: '#/components/schemas/Proposition'
+        test:
+          example:
+            userGroup:
+              $gte: 5
+          $ref: '#/components/schemas/Proposition'
+        testSource:
+          $ref: '#/components/schemas/TestSource'
+        select:
+          example:
+          - accuracy
+          - meanRank
+          - n
+          $ref: '#/components/schemas/Selection'
+        group:
+          example: userGroup
+          type: string
+        goal:
+          $ref: '#/components/schemas/Proposition'
+        evaluate:
+          example:
+            from: impressions
+            goal:
+              purchase: 'true'
+            recommend: product
+            where:
+              product.name:
+                $get: query
+              session.user:
+                $get: session.user
+          $ref: '#/components/schemas/EvaluateGroupedOperation'
+    Numeric:
+      example:
+        $numeric: 42
+      examples:
+      - $numeric: 42
+      - $numeric: 3.14
+      type: object
+      properties:
+        $numeric:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+    Exists:
+      example:
+        $exists:
+        - query
+        - product.tags
+      examples:
+      - $exists:
+        - query
+        - product.tags
+      - from: impressions
+        where:
+          $on:
+          - $exists:
+            - query
+            - customer.tags
+          - click: true
+        relate:
+        - product.title
+        - product.tags
+      type: object
+      properties:
+        $exists:
+          $ref: '#/components/schemas/PropositionSet'
+    FrequencyAggregateField:
+      example: $f
+      type: string
+      enum:
+      - $f
+    PField:
+      example: $p
+      type: string
+      enum:
+      - $p
+    AscGenericQuery:
+      example:
+        $asc: price
+      examples:
+      - $asc: price
+      - $asc: product.price
+      - $asc:
+          $multiply:
+          - product.price
+          - $p
+      type: object
+      properties:
+        $asc:
+          $ref: '#/components/schemas/Value'
+    RegressionExplanation:
+      example:
+        operation: reduction
+        proposition:
+          category: dairy
+        regressionType: categorical
+        residual: null
+        type: regression
+        value: -0.234
+      examples:
+      - operation: reduction
+        proposition:
+          category: dairy
+        regressionType: categorical
+        residual: null
+        type: regression
+        value: -0.234
+      - operation: reduction
+        proposition:
+          sale_price: 20.0
+        regressionType: linear
+        residual: 2.427
+        type: regression
+        value: -0.234
+      type: object
+      required:
+      - type
+      - proposition
+      - value
+      - regressionType
+      - operation
+      properties:
+        type:
+          description: 'The explanation type: regression.
+
+            '
+          enum:
+          - regression
+          type: string
+        proposition:
+          description: 'The field-value proposition that triggered this regression adjustment.
+
+            '
+          $ref: '#/components/schemas/PropositionExplanation'
+        value:
+          description: 'The regression effect/contribution to the score.
+
+            '
+          type: number
+        regressionType:
+          description: 'The type of regression: ''categorical'' (group effects) or ''linear'' (OLS).
+
+            '
+          type: object
+        residual:
+          description: 'For linear regression: the predictor''s residual value after its own transformation pipeline.
+
+            '
+          type: number
+        operation:
+          description: 'The operation: ''reduction'' (removing effect) or ''restoration'' (adding effect back).
+
+            '
+          type: object
+    IsPropositionExplanation:
+      oneOf:
+      - $ref: '#/components/schemas/IntArray'
+      - $ref: '#/components/schemas/LongArray'
+      - $ref: '#/components/schemas/DecimalArray'
+      - $ref: '#/components/schemas/StringArray'
+      - $ref: '#/components/schemas/BooleanArray'
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: integer
+        format: int32
+      - type: integer
+        format: int64
+      - type: number
+      - type: boolean
+      - type: 'null'
+      - type: string
+      - type: object
+    StringArray:
+      example:
+      - red
+      - green
+      - blue
+      type: array
+      items:
+        type: string
+    PlainProbability:
+      example: $p
+      examples:
+      - $p
+      - from: messages
+        get: user
+        orderBy: $p
+        where:
+          message:
+            $match: dog
+      type: string
+      enum:
+      - $p
+    MatchesProjection:
+      example: $matches
+      type: string
+      enum:
+      - $matches
+    PropositionExplanation:
+      oneOf:
+      - $ref: '#/components/schemas/FieldPropositionExplanation'
+      - $ref: '#/components/schemas/HasExplanation'
+      - $ref: '#/components/schemas/AndExplanation'
+      - $ref: '#/components/schemas/OrExplanation'
+      - $ref: '#/components/schemas/OnExplanation'
+      - $ref: '#/components/schemas/NotExplanation'
+      - $ref: '#/components/schemas/StartsWithExplanation'
+      - $ref: '#/components/schemas/GtExplanation'
+      - $ref: '#/components/schemas/GteExplanation'
+      - $ref: '#/components/schemas/LtExplanation'
+      - $ref: '#/components/schemas/LteExplanation'
+      - $ref: '#/components/schemas/DefinedExplanation'
+      - $ref: '#/components/schemas/NumericExplanation'
+      - $ref: '#/components/schemas/KnnExplanation'
+      - $ref: '#/components/schemas/NnExplanation'
+      - $ref: '#/components/schemas/IsPropositionExplanation'
+    KnnPropositionArray:
+      example:
+      - 4
+      - tags: laptop
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        oneOf:
+        - type: integer
+          format: int32
+        - oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    Sum:
+      example:
+        $sum:
+        - priceNet
+        - priceVat
+      type: object
+      properties:
+        $sum:
+          oneOf:
+          - $ref: '#/components/schemas/ContextValueQuery'
+          - type: array
+            items:
+              $ref: '#/components/schemas/Score'
+    DivisionExplanation:
+      example:
+        dividend:
+          field: return
+          type: field
+          value: 400000.0
+        divisor:
+          field: investment
+          type: field
+          value: 250000.0
+        type: division
+      type: object
+      required:
+      - type
+      - dividend
+      - divisor
+      properties:
+        type:
+          description: 'The explanation type: divide.
+
+            '
+          enum:
+          - division
+          type: string
+        dividend:
+          description: 'The divided value.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+        divisor:
+          description: 'The divider value.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+    Decision:
+      example:
+        $decision:
+          score:
+            $mean:
+              $context: clickThroughRate
+          seed: 0
+      type: object
+      properties:
+        $decision:
+          type: object
+          properties:
+            score:
+              $ref: '#/components/schemas/Score'
+            seed:
+              type: integer
+              format: int64
+    LogarithmicExplanation:
+      example:
+        inner:
+          type: constant
+          value: 0.173
+        type: log
+        value: -1.754
+      type: object
+      required:
+      - type
+      - value
+      - inner
+      properties:
+        type:
+          description: 'The explanation type: log (logarithmic transformation).
+
+            '
+          enum:
+          - log
+          type: string
+        value:
+          description: 'The logarithmic score value log(inner).
+
+            '
+          type: number
+        inner:
+          description: 'The explanation in linear space that gets log-transformed.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+    RecommendQuery:
+      type: object
+      example:
+        from: impressions
+        goal:
+          click: true
+        limit: 2
+        offset: 2
+        recommend: product
+        select:
+        - title
+        - description
+        - price
+        where:
+          customer: 4
+          query: laptop
+      required:
+      - from
+      - recommend
+      - goal
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+            query: laptop
+          $ref: '#/components/schemas/Proposition'
+        recommend:
+          example: product
+          $ref: '#/components/schemas/Get'
+        basedOn:
+          $ref: '#/components/schemas/PropositionSet'
+        goal:
+          example:
+            click: true
+          $ref: '#/components/schemas/Goal'
+        select:
+          example:
+          - title
+          - description
+          - price
+          $ref: '#/components/schemas/Projection'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    ExponentExplanation:
+      example:
+        base:
+          type: idf
+          value: 1.7551720221592049
+        power:
+          type: tf
+          value: 1.0
+        type: exponent
+        value: 1.7551720221592049
+      type: object
+      required:
+      - type
+      - value
+      - base
+      - power
+      properties:
+        type:
+          description: 'The explanation type: exponent.
+
+            '
+          enum:
+          - exponent
+          type: string
+        value:
+          description: 'The exponent score.
+
+            '
+          type: number
+        base:
+          description: 'The explanation of the base score element.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+        power:
+          description: 'The explanation of the power score element.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+    NoneExplanation:
+      example:
+        type: none
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          description: 'The explanation type: none
+
+            '
+          enum:
+          - none
+          type: string
+    Match:
+      example:
+        $match: coffee
+      examples:
+      - $match: coffee
+      - from: products
+        where:
+          name:
+            $match: coffee
+      type: object
+      properties:
+        $match:
+          oneOf:
+          - $ref: '#/components/schemas/ToString'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: string
+    KnnPropositionObject:
+      type: object
+      example:
+        k: 4
+        near:
+          tags: laptop
+      required:
+      - k
+      - near
+      properties:
+        k:
+          example: 4
+          type: integer
+          format: int32
+        near:
+          example:
+            tags: laptop
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    ScoreOperator:
+      example: $p
+      examples:
+      - $p
+      - $similarity
+      - $multiply:
+        - $p
+        - margin
+      oneOf:
+      - $ref: '#/components/schemas/PlainProbability'
+      - $ref: '#/components/schemas/Frequency'
+      - $ref: '#/components/schemas/PlainLift'
+      - $ref: '#/components/schemas/PlainSimilarity'
+      - $ref: '#/components/schemas/PlainSameness'
+      - $ref: '#/components/schemas/Hit'
+      - $ref: '#/components/schemas/ProbabilityScore'
+      - $ref: '#/components/schemas/ParametricProbabilityScore'
+      - $ref: '#/components/schemas/LiftScore'
+      - $ref: '#/components/schemas/ParametricLiftScore'
+      - $ref: '#/components/schemas/ContextFrequencyScore'
+      - $ref: '#/components/schemas/MeanScore'
+      - $ref: '#/components/schemas/MinScore'
+      - $ref: '#/components/schemas/MaxScore'
+      - $ref: '#/components/schemas/ImpactScore'
+      - $ref: '#/components/schemas/FreqP'
+      - $ref: '#/components/schemas/Decision'
+      - $ref: '#/components/schemas/SimilarityScore'
+      - $ref: '#/components/schemas/SamenessScore'
+      - $ref: '#/components/schemas/AnalogyScore'
+      - $ref: '#/components/schemas/Multiply'
+      - $ref: '#/components/schemas/Divide'
+      - $ref: '#/components/schemas/Sum'
+      - $ref: '#/components/schemas/Subtract'
+      - $ref: '#/components/schemas/Pow'
+      - $ref: '#/components/schemas/Normalize'
+    LtExplanation:
+      type: object
+      properties:
+        $lt:
+          oneOf:
+          - $ref: '#/components/schemas/IntArray'
+          - $ref: '#/components/schemas/LongArray'
+          - $ref: '#/components/schemas/DecimalArray'
+          - $ref: '#/components/schemas/StringArray'
+          - $ref: '#/components/schemas/BooleanArray'
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: boolean
+          - type: 'null'
+          - type: string
+          - type: object
+    BatchQuery:
+      type: array
+      items:
+        $ref: '#/components/schemas/AnyQuery'
+    FreqP:
+      example:
+        $freqP:
+          f: clickCount
+          n: impressionCount
+          p: 0.5
+      type: object
+      properties:
+        $freqP:
+          type: object
+          properties:
+            f:
+              $ref: '#/components/schemas/Value'
+            n:
+              $ref: '#/components/schemas/Value'
+            p:
+              $ref: '#/components/schemas/Value'
+    PredictExplanation:
+      example:
+        factors:
+        - type: baseP
+          value: 0.8048780487804879
+        - name: exclusiveness
+          type: normalizer
+          value: 0.04604801347746731
+        type: product
+      type: object
+      required:
+      - type
+      - factors
+      properties:
+        type:
+          description: 'The explanation type: product.
+
+            '
+          enum:
+          - product
+          type: string
+        factors:
+          description: 'The explanation of the probability''s factors
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoreExplanation'
+    EvaluatePredict:
+      type: object
+      example:
+        from: products
+        predict: category
+        where:
+          name:
+            $get: name
+      required:
+      - from
+      - predict
+      properties:
+        from:
+          example: products
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            name:
+              $get: name
+          $ref: '#/components/schemas/Proposition'
+        predict:
+          example: category
+          $ref: '#/components/schemas/PropositionSet'
+        basedOn:
+          $ref: '#/components/schemas/PropositionSet'
+        exclusiveness:
+          type: boolean
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          type: integer
+          format: int64
+        limit:
+          type: integer
+          format: int64
+    LiftScore:
+      example:
+        $lift: tags
+      examples:
+      - $lift: tags
+      - $lift:
+        - tags
+        - title
+      - $lift:
+          $context:
+            click: true
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $lift: tags
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $lift:
+          - tags
+          - title
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $lift:
+            $context:
+              click: true
+      type: object
+      properties:
+        $lift:
+          $ref: '#/components/schemas/PropositionSet'
+    ProjectionList:
+      example:
+      - $f
+      - price
+      - tags
+      - $mean:
+          $context: score
+      type: array
+      items:
+        $ref: '#/components/schemas/Projection'
+    SearchQuery:
+      type: object
+      example:
+        from: impressions
+        limit: 2
+        offset: 2
+        orderBy: product.title
+        select:
+        - user.name
+        - query
+        - product.title
+        - click
+        where:
+          customer: 4
+          query:
+            $match: laptop
+      required:
+      - from
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+            query:
+              $match: laptop
+          $ref: '#/components/schemas/Proposition'
+        orderBy:
+          example: product.title
+          $ref: '#/components/schemas/OrderBy'
+        select:
+          example:
+          - user.name
+          - query
+          - product.title
+          - click
+          $ref: '#/components/schemas/Projection'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    FieldProposition:
+      type: object
+      required:
+      - fieldName
+      properties:
+        fieldName:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    ScoreExplanation:
+      example:
+        type: baseP
+        value: 0.28
+      oneOf:
+      - $ref: '#/components/schemas/SumExplanation'
+      - $ref: '#/components/schemas/SubtractionExplanation'
+      - $ref: '#/components/schemas/ProductExplanation'
+      - $ref: '#/components/schemas/DivisionExplanation'
+      - $ref: '#/components/schemas/BaseProbabilityExplanation'
+      - $ref: '#/components/schemas/RelatedPropositionLiftExplanation'
+      - $ref: '#/components/schemas/HitLinkPropositionLiftExplanation'
+      - $ref: '#/components/schemas/DecoratedScoreExplanation'
+      - $ref: '#/components/schemas/HitPropositionLiftExplanation'
+      - $ref: '#/components/schemas/ConstantExplanation'
+      - $ref: '#/components/schemas/DefaultValueExplanation'
+      - $ref: '#/components/schemas/RegressionExplanation'
+      - $ref: '#/components/schemas/NamedExplanation'
+      - $ref: '#/components/schemas/BaseLiftExplanation'
+      - $ref: '#/components/schemas/PredictExplanation'
+      - $ref: '#/components/schemas/ExponentExplanation'
+      - $ref: '#/components/schemas/TermFrequencyExplanation'
+      - $ref: '#/components/schemas/InverseDocumentFrequencyExplanation'
+      - $ref: '#/components/schemas/ExponentialExplanation'
+      - $ref: '#/components/schemas/LogarithmicExplanation'
+      - $ref: '#/components/schemas/WeightedAverageExplanation'
+      - $ref: '#/components/schemas/NeighborContextExplanation'
+      - $ref: '#/components/schemas/FieldExplanation'
+      - $ref: '#/components/schemas/NoneExplanation'
+    FieldExplanation:
+      example:
+        field: price
+        type: field
+        value: 1500.0
+      type: object
+      required:
+      - type
+      - field
+      - value
+      properties:
+        type:
+          description: 'The explanation type: field.
+
+            '
+          enum:
+          - field
+          type: string
+        field:
+          description: 'The name or feature of the field.
+
+            '
+          type: string
+        value:
+          description: 'The score value.
+
+            '
+          type: number
+    MinScore:
+      example:
+        $min:
+          $context: score
+      type: object
+      properties:
+        $min:
+          $ref: '#/components/schemas/ContextValueQuery'
+    GetValueExpression:
+      example:
+        $get: query
+      examples:
+      - $get: query
+      - $get: click
+      - $get: product.title
+      type: object
+      properties:
+        $get:
+          type: string
+    HasExplanation:
+      type: object
+      properties:
+        $has:
+          oneOf:
+          - $ref: '#/components/schemas/IntArray'
+          - $ref: '#/components/schemas/LongArray'
+          - $ref: '#/components/schemas/DecimalArray'
+          - $ref: '#/components/schemas/StringArray'
+          - $ref: '#/components/schemas/BooleanArray'
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: boolean
+          - type: 'null'
+          - type: string
+          - type: object
+    ColumnName:
+      example: id
+      examples:
+      - id
+      - age
+      - product.id
+      type: string
+    WhyField:
+      example: $why
+      type: string
+      enum:
+      - $why
+    FromWhere:
+      type: object
+      example:
+        from: impressions
+        where:
+          click: true
+      required:
+      - from
+      - where
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            click: true
+          $ref: '#/components/schemas/Proposition'
+        limit:
+          type: integer
+          format: int64
+    BooleanArray:
+      example:
+      - true
+      - false
+      - true
+      type: array
+      items:
+        type: boolean
+    NnPropositionArray:
+      example:
+      - tags: laptop
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        oneOf:
+        - oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+        - type: number
+    MaxScore:
+      example:
+        $max:
+          $context: score
+      type: object
+      properties:
+        $max:
+          $ref: '#/components/schemas/ContextValueQuery'
+    TermFrequencyExplanation:
+      example:
+        type: tf
+        value: 1.0
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          description: 'The explanation type: tf.
+
+            '
+          enum:
+          - tf
+          type: string
+        value:
+          description: 'The term frequency score.
+
+            '
+          type: number
+    PlainSimilarity:
+      example: $similarity
+      examples:
+      - $similarity
+      - from: product
+        get: message
+        orderBy: $similarity
+        where:
+          title:
+            $match: iphone
+      type: string
+      enum:
+      - $similarity
+    EvaluateSimilarity:
+      type: object
+      example:
+        from: messages
+        get: product
+        similarity:
+          description:
+            $get: message
+          title:
+            $get: message
+      required:
+      - from
+      - get
+      - similarity
+      properties:
+        from:
+          example: messages
+          $ref: '#/components/schemas/From'
+        where:
+          $ref: '#/components/schemas/Proposition'
+        get:
+          example: product
+          $ref: '#/components/schemas/Get'
+        similarity:
+          example:
+            description:
+              $get: message
+            title:
+              $get: message
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          type: integer
+          format: int64
+        limit:
+          type: integer
+          format: int64
+    DefaultValueExplanation:
+      example:
+        type: default
+        value: 1.0
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          description: 'The explanation type: default value.
+
+            '
+          enum:
+          - default
+          type: string
+        value:
+          description: 'The default value.
+
+            '
+          type: number
+    ParametricLiftScore:
+      example:
+        $probabilityLift:
+          of: tags
+      examples:
+      - $probabilityLift:
+          of: tags
+      - $probabilityLift:
+          of:
+          - tags
+          - title
+      - $probabilityLift:
+          of:
+            $context:
+              click: true
+          basedOn:
+          - title
+          - tags
+          - category
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $probabilityLift:
+            of: tags
+      type: object
+      properties:
+        $probabilityLift:
+          type: object
+          properties:
+            of:
+              $ref: '#/components/schemas/PropositionSet'
+            basedOn:
+              $ref: '#/components/schemas/PropositionSet'
+    Or:
+      example:
+        $or:
+        - tags: cover
+        - tags: laptop
+      examples:
+      - $or:
+        - tags: cover
+        - tags: laptop
+      - from: products
+        where:
+          price:
+            $or:
+            - $lt: 0.9
+            - $gt: 2.1
+      type: object
+      properties:
+        $or:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Proposition'
+            - $ref: '#/components/schemas/PrimitiveProposition'
+    IndexProjection:
+      example: $index
+      type: string
+      enum:
+      - $index
+    NumericExplanation:
+      type: object
+      properties:
+        $numeric:
+          type: number
+    LteExplanation:
+      type: object
+      properties:
+        $lte:
+          oneOf:
+          - $ref: '#/components/schemas/IntArray'
+          - $ref: '#/components/schemas/LongArray'
+          - $ref: '#/components/schemas/DecimalArray'
+          - $ref: '#/components/schemas/StringArray'
+          - $ref: '#/components/schemas/BooleanArray'
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: boolean
+          - type: 'null'
+          - type: string
+          - type: object
+    RelateOrderBy:
+      example:
+        $desc: info.miTrue
+      examples:
+      - $desc: info.miTrue
+      - $asc: lift
+      oneOf:
+      - $ref: '#/components/schemas/DescRelate'
+      - $ref: '#/components/schemas/AscRelate'
+      - type: string
+    HitLinkPropositionLiftExplanation:
+      example:
+        proposition:
+          product: 5
+        type: hitLinkPropositionLift
+        value: 2.32
+      type: object
+      required:
+      - type
+      - proposition
+      - value
+      properties:
+        type:
+          description: 'The explanation type: hitLinkPropositionLift
+
+            '
+          enum:
+          - hitLinkPropositionLift
+          type: string
+        proposition:
+          description: 'The link proposition.
+
+            '
+          $ref: '#/components/schemas/PropositionExplanation'
+        value:
+          description: 'The lift value of the linked proposition.
+
+            '
+          type: number
+    ContextFrequencyScore:
+      example:
+        $f:
+          $context:
+            click: false
+      examples:
+      - $f:
+          $context:
+            click: false
+      - from: impressions
+        get: product
+        orderBy:
+          $f:
+            $context:
+              $click: true
+      type: object
+      properties:
+        $f:
+          $ref: '#/components/schemas/ContextPropositionQuery'
+    EvaluateEstimateQuery:
+      type: object
+      example:
+        evaluate:
+          estimate: price
+          from: products
+          where:
+            category:
+              $get: category
+        select:
+        - rmse
+        - mae
+        - r2
+        - n
+        test:
+          $index:
+            $mod:
+            - 10
+            - 1
+      required:
+      - evaluate
+      properties:
+        train:
+          $ref: '#/components/schemas/Proposition'
+        test:
+          example:
+            $index:
+              $mod:
+              - 10
+              - 1
+          $ref: '#/components/schemas/Proposition'
+        testSource:
+          $ref: '#/components/schemas/TestSource'
+        select:
+          example:
+          - rmse
+          - mae
+          - r2
+          - n
+          $ref: '#/components/schemas/Selection'
+        evaluate:
+          example:
+            estimate: price
+            from: products
+            where:
+              category:
+                $get: category
+          $ref: '#/components/schemas/EvaluateNumericOperation'
+    ExponentialExplanation:
+      example:
+        inner:
+          components: []
+          type: weighted_average
+          value: -1.754
+        type: exp
+        value: 0.173
+      type: object
+      required:
+      - type
+      - value
+      - inner
+      properties:
+        type:
+          description: 'The explanation type: exp (exponential transformation).
+
+            '
+          enum:
+          - exp
+          type: string
+        value:
+          description: 'The exponential score value exp(inner).
+
+            '
+          type: number
+        inner:
+          description: 'The explanation in log space that gets exponentiated.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+    TestSource:
+      type: object
+      example:
+        limit: 100
+        select:
+        - query
+        where:
+          $index:
+            $mod:
+            - 5
+            - 1
+      properties:
+        from:
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            $index:
+              $mod:
+              - 5
+              - 1
+          $ref: '#/components/schemas/Proposition'
+        offset:
+          type: integer
+          format: int64
+        limit:
+          example: 100
+          type: integer
+          format: int64
+        select:
+          example:
+          - query
+          $ref: '#/components/schemas/Selection'
+    PlainSameness:
+      example: $sameness
+      examples:
+      - $sameness
+      - from: product
+        orderBy: $sameness
+        where:
+          title:
+            $match: iphone
+      type: string
+      enum:
+      - $sameness
+    MeanScore:
+      example:
+        $mean:
+          $context: score
+      type: object
+      properties:
+        $mean:
+          $ref: '#/components/schemas/ContextValueQuery'
+    Projection:
+      oneOf:
+      - $ref: '#/components/schemas/ProjectionList'
+      - $ref: '#/components/schemas/IndexProjection'
+      - $ref: '#/components/schemas/RankProjection'
+      - $ref: '#/components/schemas/ParametricWhy'
+      - $ref: '#/components/schemas/ParametricHighlight'
+      - $ref: '#/components/schemas/HighlightProjection'
+      - $ref: '#/components/schemas/ParametricMatches'
+      - $ref: '#/components/schemas/MatchesProjection'
+      - $ref: '#/components/schemas/Expand'
+      - $ref: '#/components/schemas/ScoreOperator'
+      - $ref: '#/components/schemas/ProjectionField'
+      - $ref: '#/components/schemas/NamedProjection'
+    PrimitiveProposition:
+      example: 4
+      examples:
+      - 4
+      - 3.1
+      - false
+      - null
+      - text
+      oneOf:
+      - $ref: '#/components/schemas/GetValueExpression'
+      - type: integer
+        format: int32
+      - type: integer
+        format: int64
+      - type: number
+      - type: 'null'
+      - $ref: '#/components/schemas/ArrayValue'
+      - $ref: '#/components/schemas/ToString'
+      - type: boolean
+      - type: string
+      - $ref: '#/components/schemas/Json'
+    ContextPropositionQuery:
+      example:
+        $context:
+          click: true
+      type: object
+      properties:
+        $context:
+          $ref: '#/components/schemas/Proposition'
+    EvaluateMatch:
+      type: object
+      example:
+        from: impressions
+        limit: 2
+        match: prevProduct
+        offset: 2
+        select:
+        - title
+        - description
+        - price
+        where:
+          customer: 4
+          query: laptop
+      required:
+      - from
+      - match
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+            query: laptop
+          $ref: '#/components/schemas/Proposition'
+        select:
+          example:
+          - title
+          - description
+          - price
+          $ref: '#/components/schemas/Projection'
+        match:
+          example: prevProduct
+          $ref: '#/components/schemas/Get'
+        basedOn:
+          $ref: '#/components/schemas/PropositionSet'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    HitPropositionLiftExplanation:
+      example:
+        factors:
+        - type: baseLift
+          value: 31.0
+        proposition:
+          field: 4
+        type: hitPropositionLift
+        value: 31.0
+      type: object
+      required:
+      - type
+      - proposition
+      - value
+      - factors
+      properties:
+        type:
+          description: 'The explanation type: hitPropositionLift.
+
+            '
+          enum:
+          - hitPropositionLift
+          type: string
+        proposition:
+          description: 'The proposition.
+
+            '
+          $ref: '#/components/schemas/PropositionExplanation'
+        value:
+          description: 'The aggregated lift value.
+
+            '
+          type: number
+        factors:
+          description: 'The factors contributing to the aggregated lift and their explanation.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoreExplanation'
+    OrExplanation:
+      type: object
+      properties:
+        $or:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropositionExplanation'
+    JobsStatusResponse:
+      type: object
+      properties:
+        expiresAt:
+          description: 'Job result will not be available after the date.
+
+            '
+          format: date-time
+          type: string
+        finishedAt:
+          description: 'Job finished running.
+
+            '
+          format: date-time
+          type: string
+        id:
+          description: 'JobID.
+
+            '
+          type: string
+        parameters:
+          description: 'Empty for the query API endpoints.
+
+            '
+          type: object
+        path:
+          description: 'The query path used.
+
+            '
+          type: string
+        startedAt:
+          description: 'When the job was started.
+
+            '
+          format: date-time
+          type: string
+    OrderBy:
+      example: product.price
+      examples:
+      - product.price
+      - $asc: product.price
+      - $desc: product.price
+      - $multiply:
+        - $p
+        - prices
+      - $pow:
+        - product.width
+        - 2
+      oneOf:
+      - $ref: '#/components/schemas/DescGenericQuery'
+      - $ref: '#/components/schemas/AscGenericQuery'
+      - $ref: '#/components/schemas/Value'
+    KnnExplanation:
+      type: object
+      properties:
+        $knn:
+          type: object
+          properties:
+            k:
+              type: integer
+              format: int32
+            near:
+              type: array
+              items:
+                $ref: '#/components/schemas/PropositionExplanation'
+    OnPropositionObject:
+      type: object
+      example:
+        'on':
+          user.tags: nyc
+        prop:
+          click: true
+      required:
+      - prop
+      - 'on'
+      properties:
+        prop:
+          example:
+            click: true
+          $ref: '#/components/schemas/Proposition'
+        'on':
+          example:
+            user.tags: nyc
+          $ref: '#/components/schemas/Proposition'
+    ProbabilityScore:
+      example:
+        $p: tags
+      examples:
+      - $p: tags
+      - $p:
+        - tags
+        - title
+      - $p:
+          $context:
+            click: true
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $p: tags
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $p:
+          - tags
+          - title
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $p:
+            $context:
+              click: true
+      type: object
+      properties:
+        $p:
+          $ref: '#/components/schemas/PropositionSet'
+    Selection:
+      example:
+      - user.name
+      - query
+      - product.title
+      - click
+      examples:
+      - - user.name
+        - query
+        - product.title
+        - click
+      - - $why
+      type: array
+      items:
+        oneOf:
+        - type: string
+        - $ref: '#/components/schemas/IndexField'
+        - $ref: '#/components/schemas/WhyField'
+        - $ref: '#/components/schemas/MatchesField'
+        - $ref: '#/components/schemas/ValueField'
+        - $ref: '#/components/schemas/PropositionField'
+        - $ref: '#/components/schemas/SortField'
+        - $ref: '#/components/schemas/ScoreField'
+        - $ref: '#/components/schemas/PField'
+    Has:
+      example:
+        $has: drink
+      examples:
+      - $has: drink
+      - from: products
+        where:
+          tags:
+            $has: drink
+      type: object
+      properties:
+        $has:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Score:
+      example: 2.0
+      examples:
+      - 2.0
+      - product.margin
+      - $p
+      - $similarity
+      - $multiply:
+        - $p
+        - margin
+      oneOf:
+      - $ref: '#/components/schemas/ScoreOperator'
+      - $ref: '#/components/schemas/ColumnName'
+      - type: number
+    EvaluateQueryBase:
+      oneOf:
+      - $ref: '#/components/schemas/EvaluateGroupedQuery'
+      - $ref: '#/components/schemas/EvaluateEstimateQuery'
+      - $ref: '#/components/schemas/EvaluateQuery'
+    Value:
+      example: product.id
+      oneOf:
+      - type: string
+      - $ref: '#/components/schemas/Score'
+    ModPropositionArray:
+      example:
+      - 2
+      - 0
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    Pow:
+      example:
+        $pow:
+        - width
+        - 2
+      type: object
+      properties:
+        $pow:
+          oneOf:
+          - $ref: '#/components/schemas/ExponentPropositionObject'
+          - $ref: '#/components/schemas/ExponentPropositionArray'
+    SamenessScore:
+      example:
+        $sameness:
+          title: apple iphone
+          tags: premium ios phone
+      examples:
+      - $sameness:
+          title: apple iphone
+          tags: premium ios phone
+      - from: products
+        orderBy:
+          $sameness:
+            title: apple iphone
+            tags: premium ios phone
+      type: object
+      properties:
+        $sameness:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    LongArray:
+      example:
+      - 1000000000000
+      - 2000000000000
+      type: array
+      items:
+        type: integer
+        format: int64
+    UserDefinedObject:
+      example:
+        name: My product
+        price: 172.19
+      type: object
+    NnExplanation:
+      type: object
+      properties:
+        $nn:
+          type: object
+          properties:
+            near:
+              type: array
+              items:
+                $ref: '#/components/schemas/PropositionExplanation'
+    Lt:
+      example:
+        $lt: 4
+      examples:
+      - $lt: 4
+      - $lt: -12.1
+      - $lt: '20180502'
+      - from: products
+        where:
+          price:
+            $lt: 1.24
+      type: object
+      properties:
+        $lt:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    'On':
+      example:
+        $on:
+          prop:
+            click: true
+          'on':
+            user.tags: nyc
+      examples:
+      - $on:
+          prop:
+            click: true
+          'on':
+            user.tags: nyc
+      - $on:
+        - click: true
+        - user.tags: nyc
+      type: object
+      properties:
+        $on:
+          oneOf:
+          - $ref: '#/components/schemas/OnPropositionObject'
+          - $ref: '#/components/schemas/OnPropositionArray'
+    Get:
+      example: product
+      examples:
+      - product
+      - user
+      - text.$feature
+      - link.field
+      - link.$feature
+      - link.text.$feature
+      type: string
+    ParametricHighlight:
+      example:
+        $highlight:
+          posPreTag: <b>
+          posPostTag: </b>
+          negPreTag: <em>
+          negPostTag: </em>
+          encoder: html
+      type: object
+      properties:
+        $highlight:
+          type: object
+          properties:
+            posPreTag:
+              type: string
+            posPostTag:
+              type: string
+            negPreTag:
+              type: string
+            negPostTag:
+              type: string
+            posThreshold:
+              type: number
+            negThreshold:
+              type: number
+            encoder:
+              type: string
+    FieldPropositionExplanation:
+      type: object
+      required:
+      - fieldName
+      properties:
+        fieldName:
+          $ref: '#/components/schemas/PropositionExplanation'
+    SimilarityScore:
+      example:
+        $similarity:
+          title: apple iphone
+          tags: premium ios phone
+      examples:
+      - $similarity:
+          title: apple iphone
+          tags: premium ios phone
+      - from: products
+        orderBy:
+          $similarity:
+            title: apple iphone
+            tags: premium ios phone
+      type: object
+      properties:
+        $similarity:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    NamedProjection:
+      example:
+        from: impressions
+        get: product
+        select:
+          clicks:
+            $f:
+              $context:
+                click: true
+          ctr:
+            $mean:
+              $context: click
+          impressions: $f
+          product: name
+      examples:
+      - from: impressions
+        get: product
+        select:
+          clicks:
+            $f:
+              $context:
+                click: true
+          ctr:
+            $mean:
+              $context: click
+          impressions: $f
+          product: name
+      - failures:
+          $f:
+            $context:
+              success: false
+      - id: id
+        mean:
+          $mean:
+            $context: product.price
+      - $value: $value
+        field: field
+        id: id
+      type: object
+    WeightedAverageExplanation:
+      example:
+        components:
+        - value:
+            name: 'Neighbor value: 0.165 (original: 0.17)'
+            type: neighbor
+            value: 0.165
+          weight: 1.0
+        - value:
+            name: 'Neighbor value: 0.163 (original: 0.18)'
+            type: neighbor
+            value: 0.163
+          weight: 1.0
+        type: weightedAverage
+        value: 0.16
+      type: object
+      required:
+      - type
+      - value
+      - components
+      properties:
+        type:
+          description: 'The explanation type: weighted_average.
+
+            '
+          enum:
+          - weightedAverage
+          type: string
+        value:
+          description: 'The weighted average score.
+
+            '
+          type: number
+        components:
+          description: 'The weighted components. Final value = sum(weight[i] * value[i]) / sum(weight[i]).
+
+            '
+          type: array
+          items:
+            type: object
+            required:
+            - weight
+            - value
+            properties:
+              weight:
+                description: 'The weight of this component.
+
+                  '
+                type: number
+              value:
+                description: 'The explanation of this component''s value.
+
+                  '
+                $ref: '#/components/schemas/ScoreExplanation'
+    BaseLiftExplanation:
+      example:
+        type: baseLift
+        value: 31.0
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          description: 'The explanation type: baseLift.
+
+            '
+          enum:
+          - baseLift
+          type: string
+        value:
+          description: 'The prior lift.
+
+            '
+          type: number
+    InverseDocumentFrequencyExplanation:
+      example:
+        type: idf
+        value: 1.7551720221592049
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          description: 'The explanation type: idf.
+
+            '
+          enum:
+          - idf
+          type: string
+        value:
+          description: 'The inverse document frequency score.
+
+            '
+          type: number
+    ModPropositionObject:
+      type: object
+      example:
+        divisor: 2
+        remainder: 0
+      required:
+      - divisor
+      - remainder
+      properties:
+        divisor:
+          example: 2
+          type: integer
+          format: int64
+        remainder:
+          example: 0
+          type: integer
+          format: int64
+    Frequency:
+      example: $f
+      examples:
+      - $f
+      - from: impressions
+        get: product
+        orderBy: $f
+      type: string
+      enum:
+      - $f
+    NamedExplanation:
+      example:
+        name: exclusiveness
+        type: normalizer
+        value: 0.2982788431762749
+      type: object
+      required:
+      - type
+      - name
+      - value
+      properties:
+        type:
+          description: 'Normalizer.
+
+            '
+          type: string
+        name:
+          description: 'Exclusiveness.
+
+            '
+          type: string
+        value:
+          description: 'The value of the normalizer.
+
+            '
+          type: number
+    OnPropositionArray:
+      example:
+      - click: true
+      - user.tags: nyc
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        $ref: '#/components/schemas/Proposition'
+    PredictQuery:
+      type: object
+      example:
+        from: impressions
+        limit: 2
+        offset: 2
+        predict: prevProduct
+        where:
+          customer: 4
+          query: laptop
+      required:
+      - from
+      - predict
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+            query: laptop
+          $ref: '#/components/schemas/Proposition'
+        predict:
+          example: prevProduct
+          $ref: '#/components/schemas/PropositionSet'
+        basedOn:
+          $ref: '#/components/schemas/PropositionSet'
+          description: if predicted variable links to another table, basedOn is used to specify the fields in that table used to calculate prior estimate
+        exclusiveness:
+          type: boolean
+          description: 'Exclusiveness dictates that only one feature can be true at the same time and that one feature will be true.
+
+
+            In practice, exclusiveness enforces the probabilities of alternative features to
+
+            sum to 1.0. This is achieved with a normalizer. The normalizer is of form:
+
+
+            ```
+
+            1 / sum((p(X_0) + p(X_1) + ...))
+
+            ```
+
+            '
+          default: true
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    ParametricMatches:
+      example:
+        $matches: {}
+      type: object
+      properties:
+        $matches:
+          type: object
+          properties: null
+    PropositionSet:
+      example: product.tags
+      examples:
+      - product.tags
+      - query
+      - product
+      - tags
+      oneOf:
+      - type: array
+        items:
+          $ref: '#/components/schemas/PropositionSet'
+      - type: string
+      - $ref: '#/components/schemas/Proposition'
+    RankProjection:
+      example: $rank
+      type: string
+      enum:
+      - $rank
+    AnalogyScore:
+      example:
+        $analogy:
+          with: veronica
+          basedOn: purchases
+      examples:
+      - $analogy:
+          with: veronica
+          basedOn: purchases
+      - from: products
+        get: title
+        orderBy:
+          $analogy:
+            with: ideapad
+            basedOn: tags
+      type: object
+      properties:
+        $analogy:
+          type: object
+          properties:
+            with:
+              oneOf:
+              - $ref: '#/components/schemas/GetValueExpression'
+              - type: integer
+                format: int32
+              - type: integer
+                format: int64
+              - type: number
+              - type: 'null'
+              - $ref: '#/components/schemas/ArrayValue'
+              - $ref: '#/components/schemas/ToString'
+              - type: boolean
+              - type: string
+              - $ref: '#/components/schemas/Json'
+            basedOn:
+              $ref: '#/components/schemas/PropositionSet'
+    AscRelate:
+      example:
+        $asc: lift
+      type: object
+      properties:
+        $asc:
+          type: string
+    EvaluateOperation:
+      example:
+        from: messages
+        get: product
+        similarity:
+          description:
+            $get: message
+          title:
+            $get: message
+      examples:
+      - from: messages
+        get: product
+        similarity:
+          description:
+            $get: message
+          title:
+            $get: message
+      - from: products
+        get: product
+        orderBy: $p
+        where:
+          name:
+            $get: name
+      - from: products
+        predict: category
+        where:
+          name:
+            $get: name
+      - from: messages
+        match: product
+        where:
+          message:
+            $get: message
+      oneOf:
+      - $ref: '#/components/schemas/EvaluateSimilarity'
+      - $ref: '#/components/schemas/EvaluateGenericQuery'
+      - $ref: '#/components/schemas/EvaluatePredict'
+      - $ref: '#/components/schemas/EvaluateMatch'
+    AggregateFrequency:
+      example:
+        $f:
+          click: false
+      examples:
+      - $f:
+          click: false
+      - $f:
+          price:
+            $gt: 100
+      type: object
+      properties:
+        $f:
+          $ref: '#/components/schemas/Proposition'
+    Divide:
+      example:
+        $divide:
+        - cost
+        - 4
+      type: object
+      properties:
+        $divide:
+          oneOf:
+          - type: object
+            properties:
+              dividend:
+                $ref: '#/components/schemas/Score'
+              divisor:
+                $ref: '#/components/schemas/Score'
+          - type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              $ref: '#/components/schemas/Score'
+    NotExplanation:
+      type: object
+      properties:
+        $not:
+          $ref: '#/components/schemas/PropositionExplanation'
+    GtExplanation:
+      type: object
+      properties:
+        $gt:
+          oneOf:
+          - $ref: '#/components/schemas/IntArray'
+          - $ref: '#/components/schemas/LongArray'
+          - $ref: '#/components/schemas/DecimalArray'
+          - $ref: '#/components/schemas/StringArray'
+          - $ref: '#/components/schemas/BooleanArray'
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: object
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: boolean
+          - type: 'null'
+          - type: string
+          - type: object
+    Lte:
+      example:
+        $lte: 8
+      examples:
+      - $lte: 8
+      - $lte: 0
+      - $lte: '20180502'
+      - from: products
+        where:
+          price:
+            $lte: 1
+      type: object
+      properties:
+        $lte:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    SumExplanation:
+      example:
+        terms:
+        - field: id
+          type: field
+          value: 4.0
+        - field: price
+          type: field
+          value: 1500.0
+        type: sum
+      type: object
+      required:
+      - type
+      - terms
+      properties:
+        type:
+          description: 'The explanation type: sum.
+
+            '
+          enum:
+          - sum
+          type: string
+        terms:
+          description: 'The explanation of the summed score''s terms.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoreExplanation'
+    Is:
+      example:
+        $is: value
+      type: object
+      properties:
+        $is:
+          $ref: '#/components/schemas/PrimitiveProposition'
+    StartsWith:
+      example:
+        $startsWith: Cucumber
+      examples:
+      - $startsWith: Cucumber
+      - from: products
+        where:
+          name:
+            $startsWith: Cucumber
+      type: object
+      properties:
+        $startsWith:
+          oneOf:
+          - $ref: '#/components/schemas/ToString'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: string
+    IndexField:
+      example: $index
+      type: string
+      enum:
+      - $index
+    Proposition:
+      example:
+        customer: 4
+        query:
+          $match: laptop
+      examples:
+      - customer: 4
+        query:
+          $match: laptop
+      - price:
+          $gte: 50
+          $lt: 100
+      - tags:
+          $match: laptop
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/Is'
+      - $ref: '#/components/schemas/And'
+      - $ref: '#/components/schemas/Atomic'
+      - $ref: '#/components/schemas/Or'
+      - $ref: '#/components/schemas/Not'
+      - $ref: '#/components/schemas/Defined'
+      - $ref: '#/components/schemas/Has'
+      - $ref: '#/components/schemas/Exists'
+      - $ref: '#/components/schemas/Match'
+      - $ref: '#/components/schemas/StartsWith'
+      - $ref: '#/components/schemas/On'
+      - $ref: '#/components/schemas/Hash'
+      - $ref: '#/components/schemas/Mod'
+      - $ref: '#/components/schemas/Gt'
+      - $ref: '#/components/schemas/Gte'
+      - $ref: '#/components/schemas/Lt'
+      - $ref: '#/components/schemas/Lte'
+      - $ref: '#/components/schemas/Context'
+      - $ref: '#/components/schemas/Knn'
+      - $ref: '#/components/schemas/Nn'
+      - $ref: '#/components/schemas/Numeric'
+      - oneOf:
+        - $ref: '#/components/schemas/ToString'
+        - $ref: '#/components/schemas/GetValueExpression'
+      - $ref: '#/components/schemas/FieldProposition'
+    Subtract:
+      example:
+        $subtract:
+        - price
+        - 2
+      type: object
+      properties:
+        $subtract:
+          oneOf:
+          - type: object
+            properties:
+              minuend:
+                $ref: '#/components/schemas/Score'
+              subtrahend:
+                $ref: '#/components/schemas/Score'
+          - type: array
+            minItems: 2
+            maxItems: 2
+            items:
+              $ref: '#/components/schemas/Score'
+    AggregateList:
+      example:
+      - $f
+      - price
+      - tags
+      - $mean: score
+      type: array
+      items:
+        $ref: '#/components/schemas/AggregateProjection'
+    ValueField:
+      example: $value
+      type: string
+      enum:
+      - $value
+    MatchQuery:
+      type: object
+      example:
+        from: impressions
+        limit: 2
+        match: prevProduct
+        offset: 2
+        select:
+        - title
+        - description
+        - price
+        where:
+          customer: 4
+          query: laptop
+      required:
+      - from
+      - match
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+            query: laptop
+          $ref: '#/components/schemas/Proposition'
+        select:
+          example:
+          - title
+          - description
+          - price
+          $ref: '#/components/schemas/Projection'
+        match:
+          example: prevProduct
+          $ref: '#/components/schemas/Get'
+        basedOn:
+          $ref: '#/components/schemas/PropositionSet'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    ResponseHit:
+      example:
+        name: My product
+        price: 172.19
+      examples:
+      - name: My product
+        price: 172.19
+      - $score: 0.22350516297675496
+        $value: coffee
+        $why:
+          factors:
+          - factors:
+            - proposition:
+                name:
+                  $has: coffee
+              type: relatedPropositionLift
+              value: 8.45603245079726
+            proposition: coffee
+            type: hitPropositionLift
+            value: 8.45603245079726
+          type: product
+      oneOf:
+      - $ref: '#/components/schemas/UserDefinedObject'
+      - $ref: '#/components/schemas/PropositionExplanation'
+      - type: object
+      - $ref: '#/components/schemas/ScoreExplanation'
+    FromTablequery:
+      example: impressions
+      examples:
+      - impressions
+      - products
+      - customers
+      - messages
+      type: string
+    BaseProbabilityExplanation:
+      example:
+        proposition:
+          click: true
+        type: baseP
+        value: 0.5
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          description: 'The explanation type: baseP.
+
+            '
+          enum:
+          - baseP
+          type: string
+        value:
+          description: 'The prior probability.
+
+            '
+          type: number
+        proposition:
+          description: 'The variable.
+
+            '
+          $ref: '#/components/schemas/PropositionExplanation'
+    AggregateField:
+      example: price.$mean
+      examples:
+      - price.$mean
+      - price.$sum
+      type: string
+    DecoratedScoreExplanation:
+      type: object
+    AggregateMean:
+      example:
+        $mean: ctr
+      examples:
+      - $mean: ctr
+      - $mean:
+          $freqP:
+            f: clicks
+            n: impressions
+      type: object
+      properties:
+        $mean:
+          $ref: '#/components/schemas/Score'
+    DescRelate:
+      example:
+        $desc: info.miTrue
+      type: object
+      properties:
+        $desc:
+          type: string
+    ContextValueQuery:
+      example:
+        $context: click
+      type: object
+      properties:
+        $context:
+          $ref: '#/components/schemas/Value'
+    RelatedPropositionLiftExplanation:
+      type: object
+      required:
+      - type
+      - proposition
+      - value
+      properties:
+        type:
+          description: 'The explanation type: relatedPropositionLift.
+
+            '
+          enum:
+          - relatedPropositionLift
+          type: string
+        proposition:
+          description: 'The related proposition.
+
+            '
+          $ref: '#/components/schemas/PropositionExplanation'
+        value:
+          description: 'The lift value of the related proposition.
+
+            '
+          type: number
+    StartsWithExplanation:
+      type: object
+      properties:
+        $startsWith:
+          type: string
+    SubtractionExplanation:
+      example:
+        minuend:
+          field: price
+          type: field
+          value: 119.5
+        subtrahend:
+          field: cost
+          type: field
+          value: 100.5
+        type: subtraction
+      type: object
+      required:
+      - type
+      - minuend
+      - subtrahend
+      properties:
+        type:
+          description: 'The explanation type: divide.
+
+            '
+          enum:
+          - subtraction
+          type: string
+        minuend:
+          description: 'The subtracted value.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+        subtrahend:
+          description: 'The subtraction value.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+    EvaluateMultiGenericQuery:
+      type: object
+      example:
+        from: impressions
+        get: product
+        orderBy:
+          $p:
+            purchase: true
+        where:
+          product.name:
+            $get: query
+          session.user:
+            $get: session.user
+      required:
+      - from
+      - get
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            product.name:
+              $get: query
+            session.user:
+              $get: session.user
+          $ref: '#/components/schemas/Proposition'
+        get:
+          example: product
+          $ref: '#/components/schemas/Get'
+        orderBy:
+          example:
+            $p:
+              purchase: true
+          $ref: '#/components/schemas/OrderBy'
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          type: integer
+          format: int64
+        limit:
+          type: integer
+          format: int64
+    Gte:
+      example:
+        $gte: -2
+      examples:
+      - $gte: -2
+      - $gte: 0
+      - $gte: '20180502'
+      - from: products
+        where:
+          price:
+            $gte: 2
+      type: object
+      properties:
+        $gte:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    ConstantExplanation:
+      type: object
+      required:
+      - type
+      - value
+      properties:
+        type:
+          description: 'The explanation type
+
+            '
+          enum:
+          - constant
+          type: string
+        value:
+          type: number
+    ArrayValue:
+      oneOf:
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+    ParametricWhy:
+      example:
+        $why:
+          highlight:
+            posPreTag: <b>
+            posPostTag: </b>
+            negPreTag: <em>
+            negPostTag: </em>
+            encoder: html
+            posThreshold: 1.1
+            negThreshold: 0.9
+          matches: {}
+      type: object
+      properties:
+        $why:
+          type: object
+          properties:
+            highlight:
+              $ref: '#/components/schemas/HighlightParams'
+            matches:
+              type: object
+              properties: null
+    SimilarityQuery:
+      type: object
+      example:
+        from: impressions
+        limit: 2
+        offset: 2
+        similarity:
+          query: laptop
+        where:
+          click: 'true'
+      required:
+      - from
+      - similarity
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            click: 'true'
+          $ref: '#/components/schemas/Proposition'
+        similarity:
+          example:
+            query: laptop
+          $ref: '#/components/schemas/Proposition'
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    Normalize:
+      example:
+        $normalize: $lift
+      examples:
+      - $normalize: $lift
+      - $normalize:
+          $lift: name
+      type: object
+      properties:
+        $normalize:
+          $ref: '#/components/schemas/Score'
+    ExponentPropositionObject:
+      type: object
+      example:
+        base: width
+        exponent: 2
+      required:
+      - base
+      - exponent
+      properties:
+        base:
+          example: width
+          $ref: '#/components/schemas/Score'
+        exponent:
+          example: 2
+          $ref: '#/components/schemas/Score'
+    ProjectionField:
+      example: price
+      type: string
+    Goal:
+      example:
+        purchase: true
+      examples:
+      - purchase: true
+      - click: true
+      oneOf:
+      - $ref: '#/components/schemas/Score'
+      - $ref: '#/components/schemas/Proposition'
+    PlainLift:
+      example: $lift
+      examples:
+      - $lift
+      - from: messages
+        get: user
+        orderBy: $lift
+        where:
+          message:
+            $match: dog
+      type: string
+      enum:
+      - $lift
+    DescGenericQuery:
+      example:
+        $desc: price
+      examples:
+      - $desc: price
+      - $desc: product.price
+      - $desc:
+          $multiply:
+          - product.price
+          - $p
+      type: object
+      properties:
+        $desc:
+          $ref: '#/components/schemas/Value'
+    PropositionField:
+      example: $proposition
+      type: string
+      enum:
+      - $proposition
+    EstimateQuery:
+      type: object
+      example:
+        estimate: price
+        from: products
+        where:
+          brand: Premium
+          category: Electronics
+      required:
+      - from
+      - estimate
+      properties:
+        from:
+          example: products
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            brand: Premium
+            category: Electronics
+          $ref: '#/components/schemas/Proposition'
+        estimate:
+          example: price
+          type: string
+        model:
+          type: string
+        select:
+          $ref: '#/components/schemas/Selection'
+    EvaluateQuery:
+      type: object
+      example:
+        evaluate:
+          from: products
+          predict: category
+          where:
+            name:
+              $get: name
+        select:
+        - accuracy
+        - meanRank
+        - n
+        test:
+          $index:
+            $mod:
+            - 10
+            - 1
+      required:
+      - evaluate
+      properties:
+        train:
+          $ref: '#/components/schemas/Proposition'
+        test:
+          example:
+            $index:
+              $mod:
+              - 10
+              - 1
+          $ref: '#/components/schemas/Proposition'
+        testSource:
+          $ref: '#/components/schemas/TestSource'
+        select:
+          example:
+          - accuracy
+          - meanRank
+          - n
+          $ref: '#/components/schemas/Selection'
+        evaluate:
+          example:
+            from: products
+            predict: category
+            where:
+              name:
+                $get: name
+          $ref: '#/components/schemas/EvaluateOperation'
+    AggregateQuery:
+      type: object
+      example:
+        aggregate:
+        - click.$sum
+        - click.$mean
+        from: impressions
+        where:
+          customer: 4
+      required:
+      - from
+      - aggregate
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+          $ref: '#/components/schemas/Proposition'
+        aggregate:
+          example:
+          - click.$sum
+          - click.$mean
+          $ref: '#/components/schemas/AggregateProjection'
+        select:
+          $ref: '#/components/schemas/Selection'
+    EvaluateRecommend:
+      type: object
+      example:
+        from: impressions
+        goal:
+          purchase: 'true'
+        recommend: product
+        where:
+          product.name:
+            $get: query
+          session.user:
+            $get: session.user
+      required:
+      - from
+      - recommend
+      - goal
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            product.name:
+              $get: query
+            session.user:
+              $get: session.user
+          $ref: '#/components/schemas/Proposition'
+        recommend:
+          example: product
+          $ref: '#/components/schemas/Get'
+        goal:
+          example:
+            purchase: 'true'
+          $ref: '#/components/schemas/Proposition'
+        select:
+          $ref: '#/components/schemas/Projection'
+        offset:
+          type: integer
+          format: int64
+        limit:
+          type: integer
+          format: int64
+    Gt:
+      example:
+        $gt: 8
+      examples:
+      - $gt: 8
+      - $gt: 231.1
+      - $gt: '20150308'
+      - from: products
+        where:
+          price:
+            $gt: 2.14
+      type: object
+      properties:
+        $gt:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    DecoratedHits:
+      type: object
+      example:
+        hits:
+        - category: '108'
+          id: '6411300000494'
+          name: Juhla Mokka coffee 500g sj
+          price: 3.95
+          tags: coffee
+        offset: 0
+        total: 1
+      required:
+      - offset
+      - total
+      - hits
+      properties:
+        offset:
+          example: 0
+          type: integer
+          format: int64
+        total:
+          example: 1
+          type: integer
+          format: int64
+        hits:
+          example:
+          - category: '108'
+            id: '6411300000494'
+            name: Juhla Mokka coffee 500g sj
+            price: 3.95
+            tags: coffee
+          $ref: '#/components/schemas/Hits'
+    Multiply:
+      example:
+        $multiply:
+        - price
+        - 2
+      type: object
+      properties:
+        $multiply:
+          type: array
+          items:
+            $ref: '#/components/schemas/Score'
+    ExponentPropositionArray:
+      example:
+      - width
+      - 2
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        $ref: '#/components/schemas/Score'
+    MatchesField:
+      example: $matches
+      type: string
+      enum:
+      - $matches
+    BatchQueryResults:
+      type: array
+      items:
+        $ref: '#/components/schemas/DecoratedHits'
+    DecimalArray:
+      example:
+      - 1.5
+      - 2.7
+      - 3.14
+      type: array
+      items:
+        type: number
+    OnExplanation:
+      type: object
+      properties:
+        $on:
+          type: array
+          items:
+            $ref: '#/components/schemas/PropositionExplanation'
+    RelateQuery:
+      type: object
+      example:
+        from: impressions
+        limit: 2
+        offset: 2
+        relate: prevProduct
+        select:
+        - related
+        - condition
+        - lift
+        - ps
+        - fs
+        where:
+          customer: 4
+          query: laptop
+      required:
+      - from
+      - relate
+      properties:
+        from:
+          example: impressions
+          $ref: '#/components/schemas/From'
+        where:
+          example:
+            customer: 4
+            query: laptop
+          $ref: '#/components/schemas/Proposition'
+        relate:
+          example: prevProduct
+          $ref: '#/components/schemas/PropositionSet'
+        orderBy:
+          $ref: '#/components/schemas/RelateOrderBy'
+        select:
+          example:
+          - related
+          - condition
+          - lift
+          - ps
+          - fs
+          $ref: '#/components/schemas/Selection'
+        offset:
+          example: 2
+          type: integer
+          format: int64
+          description: The number of results to skip from the beginning.
+          default: 0
+        limit:
+          example: 2
+          type: integer
+          format: int64
+          description: The maximum number of results to retrieve.
+          default: 10
+    Atomic:
+      example:
+        $atomic:
+          tags: pen
+          price:
+            $gte: 200
+      examples:
+      - $atomic:
+          tags: pen
+          price:
+            $gte: 200
+      - from: products
+        where:
+          $atomic:
+            tags: pen
+            price:
+              $gte: 200
+      type: object
+      properties:
+        $atomic:
+          $ref: '#/components/schemas/Proposition'
+    Context:
+      example:
+        $context:
+          click: true
+      examples:
+      - $context:
+          click: true
+      - from: impressions
+        where:
+          customerEmail: john.doe@aito.ai
+          query: laptop
+        get: product
+        orderBy:
+          $p:
+            $context:
+              click: true
+      type: object
+      properties:
+        $context:
+          $ref: '#/components/schemas/Proposition'
+    ParametricProbabilityScore:
+      example:
+        $probability:
+          of: tags
+      examples:
+      - $probability:
+          of: tags
+      - $probability:
+          of:
+          - tags
+          - title
+      - $probability:
+          of:
+            $context:
+              click: true
+          basedOn:
+          - title
+          - tags
+          - category
+      - from: impressions
+        where:
+          product.title:
+            $match: iphone
+        get: product
+        orderBy:
+          $probability:
+            of: tags
+      type: object
+      properties:
+        $probability:
+          type: object
+          properties:
+            of:
+              $ref: '#/components/schemas/PropositionSet'
+            basedOn:
+              $ref: '#/components/schemas/PropositionSet'
+    ImpactScore:
+      example:
+        $impact:
+          value:
+            $context: score
+          base: 2.5
+      examples:
+      - $impact:
+          value:
+            $context: score
+          base: 2.5
+      - from: projects
+        get: customer.industry
+        orderBy:
+          $impact:
+            value:
+              $context: profit
+      type: object
+      properties:
+        $impact:
+          type: object
+          properties:
+            value:
+              $ref: '#/components/schemas/ContextValueQuery'
+            base:
+              type: number
+    ToString:
+      example:
+        $toString: 4
+      type: object
+      properties:
+        $toString:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Defined:
+      example:
+        $defined: true
+      type: object
+      properties:
+        $defined:
+          type: boolean
+    AnyQuery:
+      oneOf:
+      - $ref: '#/components/schemas/SimilarityQuery'
+      - $ref: '#/components/schemas/PredictQuery'
+      - $ref: '#/components/schemas/RecommendQuery'
+      - $ref: '#/components/schemas/MatchQuery'
+      - $ref: '#/components/schemas/RelateQuery'
+      - $ref: '#/components/schemas/Query'
+      - $ref: '#/components/schemas/SearchQuery'
+    NeighborContextExplanation:
+      example:
+        adjustments:
+          terms:
+          - type: original_value
+            value: 2.3
+          - type: adjustment
+            value: 0.1
+          type: sum
+        hitScore: 0.95
+        instance:
+          brand: Premium
+          category: Books
+        original: 2.3
+        position: row_123
+        type: neighborContext
+        value: 2.4
+      type: object
+      required:
+      - type
+      - value
+      - original
+      - adjustments
+      - instance
+      - position
+      properties:
+        type:
+          description: 'The explanation type: neighbor_context (K-NN neighbor with instance data).
+
+            '
+          enum:
+          - neighborContext
+          type: string
+        value:
+          description: 'The adjusted neighbor value.
+
+            '
+          type: number
+        original:
+          description: 'The original neighbor value before adjustments.
+
+            '
+          type: number
+        adjustments:
+          description: 'Explanation of how original value was adjusted.
+
+            '
+          $ref: '#/components/schemas/ScoreExplanation'
+        instance:
+          description: 'The instance features for this neighbor.
+
+            '
+          $ref: '#/components/schemas/ResponseHit'
+        hitScore:
+          description: 'Similarity/hit score for this neighbor.
+
+            '
+          type: number
+        position:
+          description: 'Position/ID reference for this neighbor.
+
+            '
+          type: string
+    Nn:
+      example:
+        $nn:
+        - tags: laptop
+      examples:
+      - $nn:
+        - tags: laptop
+      - $nn:
+          near:
+            tags: laptop
+      type: object
+      properties:
+        $nn:
+          oneOf:
+          - $ref: '#/components/schemas/NnPropositionObject'
+          - $ref: '#/components/schemas/NnPropositionArray'
+    From:
+      example:
+        from: impressions
+        where:
+          click: true
+      examples:
+      - from: impressions
+        where:
+          click: true
+      - impressions
+      - from:
+          from: impressions
+          where:
+            click: true
+        orderBy: $p
+        where:
+          query: laptop
+      - from: impressions
+      oneOf:
+      - $ref: '#/components/schemas/FromWhere'
+      - $ref: '#/components/schemas/FromTablequery'
+    And:
+      example:
+        $and:
+        - $gt: 10
+        - $lt: 20
+      examples:
+      - $and:
+        - $gt: 10
+        - $lt: 20
+      - from: products
+        where:
+          price:
+            $and:
+            - $gt: 1.5
+            - $lt: 2.1
+      type: object
+      properties:
+        $and:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Proposition'
+            - $ref: '#/components/schemas/PrimitiveProposition'
+    Json:
+      type: object
+      properties:
+        $json:
+          type: object
+    Expand:
+      example:
+        $expand:
+          $mean:
+            $context: score
+      type: object
+      properties:
+        $expand:
+          $ref: '#/components/schemas/ScoreOperator'
+    JobsResponse:
+      type: object
+      properties:
+        id:
+          description: 'JobID.
+
+            '
+          type: string
+        parameters:
+          description: 'Empty for the query API endpoints.
+
+            '
+          type: object
+          format: int64
+        path:
+          description: 'The query path used.
+
+            '
+          type: string
+        startedAt:
+          description: 'When the job was started.
+
+            '
+          format: date-time
+          type: string
+    EstimateResult:
+      example:
+        name: My product
+        price: 172.19
+      examples:
+      - name: My product
+        price: 172.19
+      - $score: 0.22350516297675496
+        $value: coffee
+        $why:
+          factors:
+          - factors:
+            - proposition:
+                name:
+                  $has: coffee
+              type: relatedPropositionLift
+              value: 8.45603245079726
+            proposition: coffee
+            type: hitPropositionLift
+            value: 8.45603245079726
+          type: product
+      oneOf:
+      - $ref: '#/components/schemas/UserDefinedObject'
+      - $ref: '#/components/schemas/PropositionExplanation'
+      - type: object
+      - $ref: '#/components/schemas/ScoreExplanation'
+    ProductExplanation:
+      example:
+        factors:
+        - factors:
+          - type: baseLift
+            value: 31.0
+          proposition:
+            id: 3
+          type: hitPropositionLift
+          value: 31.0
+        - field: price
+          type: field
+          value: 1500.0
+        type: product
+      type: object
+      required:
+      - type
+      - factors
+      properties:
+        type:
+          description: 'The explanation type: product.
+
+            '
+          enum:
+          - product
+          type: string
+        factors:
+          description: 'The explanation of the product score''s factors.
+
+            '
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoreExplanation'
+    DefinedExplanation:
+      type: object
+      properties:
+        $defined:
+          type: boolean
+  parameters:
+    Query:
+      name: query
+      in: path
+      required: true
+      description: Any of the Aito query endpoints
+      schema:
+        type: string
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

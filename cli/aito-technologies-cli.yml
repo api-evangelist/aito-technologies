@@ -1,0 +1,30 @@
+generated: '2026-07-17'
+method: searched
+source: https://aito-python-sdk.readthedocs.io/en/latest/
+binary: aito
+package: aitoai
+install:
+- pip install aitoai
+credentials:
+  env_vars:
+  - AITO_INSTANCE_URL
+  - AITO_API_KEY
+  notes: Database actions require Aito instance credentials configured via environment variables.
+discovery:
+  command: aito list
+  notes: Run `aito list` to enumerate all available commands.
+command_groups:
+- name: database
+  summary: >-
+    Instance/database actions — create and delete tables, upload data in batch
+    or from file, and manage schema against a live Aito instance.
+- name: infer-table-schema
+  summary: Infer an Aito table schema from a data file (CSV/NDJSON).
+- name: convert
+  summary: Convert local data files into Aito-compatible upload formats.
+docs: https://aito-python-sdk.readthedocs.io/en/latest/
+notes: >-
+  Command groups are documented in the Aito Python SDK CLI docs; exact
+  subcommand/flag surface is enumerated at runtime via `aito list` and in the
+  readthedocs CLI reference. Captured at group level to avoid transcribing
+  unverified subcommand signatures.

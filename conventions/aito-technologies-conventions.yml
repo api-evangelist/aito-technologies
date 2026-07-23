@@ -1,0 +1,50 @@
+generated: '2026-07-17'
+method: searched
+source: https://aito.ai/docs/api/
+sources:
+- https://aito.ai/docs/api/
+- https://aito.ai/docs/api/llms.txt
+- openapi/aito-technologies-openapi-original.yml
+authentication:
+  style: api-key
+  header: x-api-key
+  key_types:
+  - read-only
+  - read/write
+  env_vars:
+  - AITO_INSTANCE_URL
+  - AITO_API_KEY
+  ref: authentication/aito-technologies-authentication.yml
+base_url:
+  pattern: https://your-instance.aito.app
+  path_prefix: /api/v1
+  public_demo: https://shared.aito.ai/db/aito-demo/api/v1
+versioning:
+  scheme: uri-path
+  current: v1
+  ref: lifecycle/aito-technologies-lifecycle.yml
+pagination:
+  style: offset-limit
+  location: request-body
+  params:
+    offset: offset
+    limit: limit
+  default_limit: 10
+  response_fields:
+  - offset
+  - total
+  - hits
+idempotency:
+  supported: false
+  notes: No idempotency-key header or parameter is documented or present in the OpenAPI.
+request_semantics:
+  method: POST
+  content_type: application/json
+  max_payload_bytes: 10485760
+  query_timeout_seconds: 30
+error_envelope:
+  content_type: application/json
+  problem_details: false
+  ref: errors/aito-technologies-problem-types.yml
+rate_limiting:
+  documented: false

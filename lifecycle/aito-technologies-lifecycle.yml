@@ -1,0 +1,20 @@
+generated: '2026-07-17'
+method: searched
+source: https://aito.ai/docs/api/
+versioning:
+  scheme: uri-path
+  current: v1
+  docs: https://aito.ai/docs/api/
+deprecation:
+  policy_url: null
+  sunset_header: false
+  notes: No formal deprecation policy or RFC 8594 Sunset/Deprecation header support was found.
+sla:
+  url: https://aito.ai/trust/
+  uptime_target: '99.9%'
+  notes: >-
+    A 99.9% uptime target is referenced in Aito marketing/trust material; not
+    published as a contractual SLA document.
+status_page: https://aitostatus.statuspage.io
+changelog: https://aito.releasenotes.io/
+deprecated_operations: []

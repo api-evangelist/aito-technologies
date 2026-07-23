@@ -1,0 +1,34 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for Aito.ai Query API
+  version: 1.0.0
+extends: openapi/aito-technologies-openapi-original.yml
+actions:
+- target: $.info
+  description: Add API Evangelist enrichment metadata.
+  update:
+    x-apievangelist-provider: aito-technologies
+    x-apievangelist-enriched: '2026-07-17'
+    x-api-base-url-pattern: https://your-instance.aito.app/api/v1
+    x-authentication: authentication/aito-technologies-authentication.yml
+    x-conventions: conventions/aito-technologies-conventions.yml
+    x-error-catalog: errors/aito-technologies-problem-types.yml
+- target: $.servers
+  description: Document the instance base-URL pattern and public demo host (spec ships no servers[]).
+  update:
+  - url: https://{instance}.aito.app
+    description: Per-tenant Aito instance.
+    variables:
+      instance:
+        default: your-instance
+  - url: https://shared.aito.ai
+    description: Public shared demo instance (aito-demo database).
+- target: $.tags
+  description: Note the x-api-key authentication style at the tag level.
+  update:
+  - name: query
+    description: Predictive query operations (predict, recommend, search, similarity, match, relate).
+  - name: data
+    description: Row-level data management operations.
+  - name: schema
+    description: Database schema management operations.

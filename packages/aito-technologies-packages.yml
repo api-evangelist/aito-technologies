@@ -1,0 +1,22 @@
+generated: '2026-07-17'
+method: searched
+source: https://pypi.org/project/aitoai/
+packages:
+- language: python
+  registry: pypi
+  name: aitoai
+  url: https://pypi.org/project/aitoai/
+  install: pip install aitoai
+  official: true
+  source_code: https://github.com/AitoDotAI/aito-python-tools
+  docs: https://aito-python-sdk.readthedocs.io/en/latest/
+  description: >-
+    Official Aito.ai Python SDK and command-line tools (the `aito` CLI plus a
+    Python client) for managing schema, uploading data, and running predictive
+    queries against an Aito instance.
+notes: >-
+  The npm package `aito` and PyPI package `aito` are unrelated third-party
+  projects (a web framework / test suite), NOT Aito.ai libraries. Aito.ai
+  publishes no official JavaScript/TypeScript SDK on npm; its GitHub org
+  (github.com/AitoDotAI) hosts demo apps and an Airtable integration but no
+  first-party JS client package.

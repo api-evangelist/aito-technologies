@@ -1,0 +1,46 @@
+generated: '2026-07-17'
+method: derived
+status: candidate
+source: openapi/aito-technologies-openapi-original.yml
+notes: >-
+  No official hosted/remote Aito MCP server was found (no entry in the MCP
+  registry, no @modelcontextprotocol package, none referenced in Aito docs). The
+  tools below are a CANDIDATE surface derived one-per-operation from the Aito
+  Query API OpenAPI, suitable for a wrapping MCP server.
+server:
+  name: aito
+  transport: http
+tools:
+- name: search
+  description: Search rows in a table with a where filter.
+  source_operation: openapi/aito-technologies-openapi-original.yml#search
+- name: predict
+  description: Predict the likelihood of a feature given a hypothesis.
+  source_operation: openapi/aito-technologies-openapi-original.yml#predict
+- name: recommend
+  description: Recommend a row that optimizes a given goal.
+  source_operation: openapi/aito-technologies-openapi-original.yml#recommend
+- name: similarity
+  description: Find distance-ranked similar rows.
+  source_operation: openapi/aito-technologies-openapi-original.yml#similarity
+- name: match
+  description: Pattern-match rows against a proposition.
+  source_operation: openapi/aito-technologies-openapi-original.yml#match
+- name: relate
+  description: Compute statistical relationships between fields.
+  source_operation: openapi/aito-technologies-openapi-original.yml#relate
+- name: estimate
+  description: Estimate numeric field values using K-NN.
+  source_operation: openapi/aito-technologies-openapi-original.yml#estimate
+- name: aggregate
+  description: Aggregate data across rows.
+  source_operation: openapi/aito-technologies-openapi-original.yml#aggregate
+- name: evaluate
+  description: Measure predictive accuracy of a query.
+  source_operation: openapi/aito-technologies-openapi-original.yml#evaluate
+- name: query
+  description: Run a generic query with highlights.
+  source_operation: openapi/aito-technologies-openapi-original.yml#query
+- name: batch
+  description: Run multiple query operations in one request.
+  source_operation: openapi/aito-technologies-openapi-original.yml#batch

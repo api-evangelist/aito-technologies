@@ -1,0 +1,16 @@
+generated: '2026-07-17'
+method: generated
+source: openapi/aito-technologies-openapi-original.yml
+skills:
+- file: aito-technologies-predict-a-field.md
+  name: Predict a field value with Aito
+  api: openapi/aito-technologies-openapi-original.yml
+  operations: [predict, search]
+- file: aito-technologies-recommend-items.md
+  name: Recommend items that optimize a goal with Aito
+  api: openapi/aito-technologies-openapi-original.yml
+  operations: [recommend, search]
+- file: aito-technologies-search-and-match.md
+  name: Search and pattern-match rows with Aito
+  api: openapi/aito-technologies-openapi-original.yml
+  operations: [search, similarity, match]
