@@ -1,0 +1,231 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Aito Technologies data query API"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "x-api-key",
+      "value": "{{x-api-key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "query",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "POST /api/v1/jobs/{query}",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/jobs/:query",
+            "params": [
+              {
+                "name": "query",
+                "value": "",
+                "type": "path",
+                "description": "Any of the Aito query endpoints"
+              }
+            ]
+          },
+          "docs": "Create a job for a query"
+        },
+        {
+          "info": {
+            "name": "GET /api/v1/jobs/",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/jobs/"
+          },
+          "docs": "Get status for all jobs"
+        },
+        {
+          "info": {
+            "name": "GET /api/v1/jobs/{uuid}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/jobs/:uuid"
+          },
+          "docs": "Get status for a job"
+        },
+        {
+          "info": {
+            "name": "GET /api/v1/jobs/{uuid}/result",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/jobs/:uuid/result"
+          },
+          "docs": "Get result for an evaluate job query"
+        },
+        {
+          "info": {
+            "name": "search",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_search",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "similarity",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_similarity",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "predict",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_predict",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "match",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_match",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "recommend",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_recommend",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "relate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_relate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "query",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_query",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "aggregate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_aggregate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "estimate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_estimate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "evaluate",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_evaluate",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/_batch",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

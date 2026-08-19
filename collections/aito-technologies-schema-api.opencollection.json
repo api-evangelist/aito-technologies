@@ -1,0 +1,212 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Aito Technologies data schema API"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "x-api-key",
+      "value": "{{x-api-key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "schema",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/schema"
+          },
+          "docs": "Return the schema that is provisioned at the moment."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://shared.aito.ai/api/v1/schema",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Initialize the database with a new schema."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://shared.aito.ai/api/v1/schema"
+          },
+          "docs": "Delete the entire schema and drop the stored data."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/schema/:table",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ]
+          },
+          "docs": "Return the schema of the specified table."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://shared.aito.ai/api/v1/schema/:table",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add the specified table to the schema. **NOTE**: If a table with the same name exists in the database, the operation deletes all data in this table and updates the table with the specified schema."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://shared.aito.ai/api/v1/schema/:table",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ]
+          },
+          "docs": "Deletes the specified table from the database."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/schema/:table/:column",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ]
+          },
+          "docs": "Return the schema of the specified column."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://shared.aito.ai/api/v1/schema/:table/:column",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Add or replace the specified column using the given schema."
+        },
+        {
+          "info": {
+            "name": "schema",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://shared.aito.ai/api/v1/schema/:table/:column",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ]
+          },
+          "docs": "Delete the specified column from a table."
+        },
+        {
+          "info": {
+            "name": "rename_table",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/schema/_rename",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "copy_table",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/schema/_copy",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -68,7 +68,9 @@ paths:
     put:
       tags:
       - schema
-      description: 'Add the specified table to the schema. **NOTE**: If a table with the same name exists in the database, the operation deletes all data in this table and updates the table with the specified schema.'
+      description: 'Add the specified table to the schema. **NOTE**: If a table with the same name exists
+        in the database, the operation deletes all data in this table and updates the table with the specified
+        schema.'
       operationId: schema
       parameters:
       - $ref: '#/components/parameters/Table'
@@ -202,7 +204,8 @@ components:
       - type: object
         properties:
           value:
-            description: Value that existing rows get. Optional if the column is nullable or the table is empty.
+            description: Value that existing rows get. Optional if the column is nullable or the table
+              is empty.
             nullable: true
             oneOf:
             - type: integer
@@ -212,7 +215,12 @@ components:
             - type: string
     TextType:
       type: object
-      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
+      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts\
+        \ features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n\
+        * `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would\
+        \ be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features\
+        \ by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"\
+        databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
       example:
         type: Text
         analyzer: English
@@ -429,7 +437,8 @@ components:
 
         The json data type can be any atomic JSON value, object, array or nested structure.
 
-        The json value is turned into a single feature. For example `{"list":[1, 2], "value":true}` becomes 1
+        The json value is turned into a single feature. For example `{"list":[1, 2], "value":true}` becomes
+        1
 
         feature: `{"list":[1, 2], "value":true}`."
 
@@ -748,7 +757,8 @@ components:
 
         Arrays contain ordered lists of primitive values of a single type.
 
-        Supported item types: Int (Int[]), Long (Long[]), Decimal (Decimal[]), Boolean (Boolean[]), String (String[]).
+        Supported item types: Int (Int[]), Long (Long[]), Decimal (Decimal[]), Boolean (Boolean[]), String
+        (String[]).
 
         Arrays are useful for storing multi-valued attributes like tags, categories, or feature vectors."
 
@@ -798,3 +808,6 @@ components:
       type: apiKey
       in: header
       name: x-api-key
+servers:
+- url: https://shared.aito.ai
+  description: Base URL reconciled from apis.yml

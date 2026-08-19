@@ -33,7 +33,9 @@ paths:
     post:
       tags:
       - data
-      description: 'Insert a batch of data entries into the specfied table. The batch is assumed to be a JSON array of valid entries according to the provisioned schema. ***NOTE***: Batch API supports maximum payloads of 10MB.'
+      description: 'Insert a batch of data entries into the specfied table. The batch is assumed to be
+        a JSON array of valid entries according to the provisioned schema. ***NOTE***: Batch API supports
+        maximum payloads of 10MB.'
       parameters:
       - $ref: '#/components/parameters/Table'
       requestBody:
@@ -81,7 +83,8 @@ paths:
       - data
       description: 'The first step of inserting data entries into the specified table using file-upload.
 
-        The operation returns a signed S3-URL and a method so that one can upload the file using the accepeted method. ***NOTE***: The file must be in gzip compressed [ndjson](http://ndjson.org/) format.
+        The operation returns a signed S3-URL and a method so that one can upload the file using the accepeted
+        method. ***NOTE***: The file must be in gzip compressed [ndjson](http://ndjson.org/) format.
 
         The operation also returns an id that will be used when triggering file processing [See step 2](#/api/v1/data/{table}/file/{uuid}).'
       parameters:
@@ -99,9 +102,11 @@ paths:
     post:
       tags:
       - data
-      description: 'The second step of inserting data entries into the specified table using file-upload [See the first step: Initiate file upload](#/api/v1/data/{table}/file).
+      description: 'The second step of inserting data entries into the specified table using file-upload
+        [See the first step: Initiate file upload](#/api/v1/data/{table}/file).
 
-        The operation starts the processing a previously uploaded file. ***NOTE***: The specified id must match the job id from the previous file upload initiation.'
+        The operation starts the processing a previously uploaded file. ***NOTE***: The specified id must
+        match the job id from the previous file upload initiation.'
       parameters:
       - $ref: '#/components/parameters/Table'
       - $ref: '#/components/parameters/JobId'
@@ -117,7 +122,8 @@ paths:
     get:
       tags:
       - data
-      description: 'Return the current status of the specified file upload job using its id. ***NOTE***: The specfied id must match the job id from the previous [file upload initiation](#/api/v1/data/{table}/file).'
+      description: 'Return the current status of the specified file upload job using its id. ***NOTE***:
+        The specfied id must match the job id from the previous [file upload initiation](#/api/v1/data/{table}/file).'
       parameters:
       - $ref: '#/components/parameters/Table'
       - $ref: '#/components/parameters/JobId'
@@ -1201,3 +1207,6 @@ components:
       type: apiKey
       in: header
       name: x-api-key
+servers:
+- url: https://shared.aito.ai
+  description: Base URL reconciled from apis.yml

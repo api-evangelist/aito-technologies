@@ -2,11 +2,9 @@ generated: '2026-07-17'
 method: derived
 status: candidate
 source: openapi/aito-technologies-openapi-original.yml
-notes: >-
-  No official hosted/remote Aito MCP server was found (no entry in the MCP
-  registry, no @modelcontextprotocol package, none referenced in Aito docs). The
-  tools below are a CANDIDATE surface derived one-per-operation from the Aito
-  Query API OpenAPI, suitable for a wrapping MCP server.
+notes: No official hosted/remote Aito MCP server was found (no entry in the MCP registry, no @modelcontextprotocol
+  package, none referenced in Aito docs). The tools below are a CANDIDATE surface derived one-per-operation
+  from the Aito Query API OpenAPI, suitable for a wrapping MCP server.
 server:
   name: aito
   transport: http
@@ -44,3 +42,9 @@ tools:
 - name: batch
   description: Run multiple query operations in one request.
   source_operation: openapi/aito-technologies-openapi-original.yml#batch
+deployment:
+  mode: none
+  verified: derived
+  tools: 11
+  checked: '2026-08-12'
+  source: catalog MCP census

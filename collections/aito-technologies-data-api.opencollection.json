@@ -1,0 +1,183 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Aito Technologies data API"
+  },
+  "request": {
+    "auth": {
+      "type": "apikey",
+      "key": "x-api-key",
+      "value": "{{x-api-key}}",
+      "placement": "header"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "data",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "POST /api/v1/data/{table}",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/:table",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Insert a single data entry intp the specified table."
+        },
+        {
+          "info": {
+            "name": "POST /api/v1/data/{table}/batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/:table/batch",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Insert a batch of data entries into the specfied table. The batch is assumed to be a JSON array of valid entries according to the provisioned schema. ***NOTE***: Batch API supports maximum payloads of 10MB."
+        },
+        {
+          "info": {
+            "name": "optimize optimizes the database by rewriting it as a single segment.",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/:table/optimize",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "optimize optimizes the database by rewriting it as a single segment."
+        },
+        {
+          "info": {
+            "name": "POST /api/v1/data/{table}/file",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/:table/file",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              }
+            ]
+          },
+          "docs": "The first step of inserting data entries into the specified table using file-upload.\nThe operation returns a signed S3-URL and a method so that one can upload the file using the accepeted method. ***NOTE***: The file must be in gzip compressed [ndjson](http://ndjson.org/) format.\nThe operation also returns an id that will be used when triggering file processing [See step 2](#/api/v1/data/{table}/file/{uuid})."
+        },
+        {
+          "info": {
+            "name": "GET /api/v1/data/{table}/file/{uuid}",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://shared.aito.ai/api/v1/data/:table/file/:uuid",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              },
+              {
+                "name": "uuid",
+                "value": "",
+                "type": "path",
+                "description": "The assigned id of the operation"
+              }
+            ]
+          },
+          "docs": "Return the current status of the specified file upload job using its id. ***NOTE***: The specfied id must match the job id from the previous [file upload initiation](#/api/v1/data/{table}/file)."
+        },
+        {
+          "info": {
+            "name": "POST /api/v1/data/{table}/file/{uuid}",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/:table/file/:uuid",
+            "params": [
+              {
+                "name": "table",
+                "value": "",
+                "type": "path",
+                "description": "The name of the table to add data to"
+              },
+              {
+                "name": "uuid",
+                "value": "",
+                "type": "path",
+                "description": "The assigned id of the operation"
+              }
+            ]
+          },
+          "docs": "The second step of inserting data entries into the specified table using file-upload [See the first step: Initiate file upload](#/api/v1/data/{table}/file).\nThe operation starts the processing a previously uploaded file. ***NOTE***: The specified id must match the job id from the previous file upload initiation."
+        },
+        {
+          "info": {
+            "name": "delete",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/_delete",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        },
+        {
+          "info": {
+            "name": "modify",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://shared.aito.ai/api/v1/data/_modify",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

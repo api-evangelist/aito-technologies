@@ -401,12 +401,15 @@ components:
             '
           type: number
         baseAccuracy:
-          description: 'The simulated accuracy of predictions based on taking the most frequent value. This is not the actual Aito accuracy, but useful to understand how much better results Aito can provide.
+          description: 'The simulated accuracy of predictions based on taking the most frequent value.
+            This is not the actual Aito accuracy, but useful to understand how much better results Aito
+            can provide.
 
             '
           type: number
         accuracyGain:
-          description: 'How much better results Aito was able to provide compared to a naive prediction. `accuracy - baseAccuracy`.
+          description: 'How much better results Aito was able to provide compared to a naive prediction.
+            `accuracy - baseAccuracy`.
 
             '
           type: number
@@ -1004,12 +1007,14 @@ components:
             '
           type: object
         residual:
-          description: 'For linear regression: the predictor''s residual value after its own transformation pipeline.
+          description: 'For linear regression: the predictor''s residual value after its own transformation
+            pipeline.
 
             '
           type: number
         operation:
-          description: 'The operation: ''reduction'' (removing effect) or ''restoration'' (adding effect back).
+          description: 'The operation: ''reduction'' (removing effect) or ''restoration'' (adding effect
+            back).
 
             '
           type: object
@@ -2857,10 +2862,12 @@ components:
           $ref: '#/components/schemas/PropositionSet'
         basedOn:
           $ref: '#/components/schemas/PropositionSet'
-          description: if predicted variable links to another table, basedOn is used to specify the fields in that table used to calculate prior estimate
+          description: if predicted variable links to another table, basedOn is used to specify the fields
+            in that table used to calculate prior estimate
         exclusiveness:
           type: boolean
-          description: 'Exclusiveness dictates that only one feature can be true at the same time and that one feature will be true.
+          description: 'Exclusiveness dictates that only one feature can be true at the same time and
+            that one feature will be true.
 
 
             In practice, exclusiveness enforces the probabilities of alternative features to
@@ -4331,3 +4338,6 @@ components:
       type: apiKey
       in: header
       name: x-api-key
+servers:
+- url: https://shared.aito.ai
+  description: Base URL reconciled from apis.yml
