@@ -35,6 +35,16 @@ image: https://console.aito.ai/aito-favicon-128.png
 tags:
 - Company
 - Predictive Database
+- Machine-Learning
+- Artificial Intelligence
+- Recommendations
+- Search
+- Predictive Analytics
+- Automation
+- Data
+tags_raw:
+- Company
+- Predictive Database
 - Machine Learning
 - Artificial Intelligence
 - Recommendations
@@ -49,6 +59,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Data
+  tags_raw:
   - data
   properties:
   - type: OpenAPI
@@ -63,6 +75,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Query
+  tags_raw:
   - query
   properties:
   - type: OpenAPI
@@ -77,6 +91,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Schema
+  tags_raw:
   - schema
   properties:
   - type: OpenAPI
