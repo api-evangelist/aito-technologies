@@ -1,0 +1,36 @@
+# Front Door AI Index — aito-technologies — 2026-09-17
+# AI vocabulary counted on the provider's root page. Generated; do not edit.
+# `score` is null unless ownership is `own` — see front_door_ai.py.
+front_door_ai:
+  slug: aito-technologies
+  lexicon_version: '1.0'
+  probed_at: '2026-09-17'
+  host: aito.ai
+  final_host: aito.ai
+  ownership: own
+  owner: aito-technologies
+  shares_host_with: null
+  inherited_from: null
+  verdict: scored
+  score: 27
+  host_score: 27
+  density: 16.49
+  words: 1637
+  tiers:
+    agentic: 11
+    core: 16
+    model: 0
+  ambiguous: 63
+  top_terms:
+    predictive: 38
+    agent: 12
+    smart: 8
+    LLMs: 7
+    prompts: 5
+    AI: 4
+    automation: 4
+    ML: 3
+    RAG: 2
+    AI agent: 1
+    copilot: 1
+    embedding: 1

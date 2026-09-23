@@ -1,9 +1,7 @@
 {
   "provider": "aito-technologies",
   "sources": [
-    "aito-technologies-data-api-openapi.yml",
-    "aito-technologies-query-api-openapi.yml",
-    "aito-technologies-schema-api-openapi.yml"
+    "_original/aito-technologies-openapi-original.yml"
   ],
   "outputs": [
     "aito-technologies-data-api-openapi.yml",
@@ -11,12 +9,18 @@
     "aito-technologies-schema-api-openapi.yml"
   ],
   "archived": [],
-  "errors": [],
-  "warnings": [
-    "aito-technologies-data-api-openapi.yml: info.version missing",
-    "aito-technologies-query-api-openapi.yml: info.version missing",
-    "aito-technologies-schema-api-openapi.yml: info.version missing"
+  "errors": [
+    "aito-technologies-openapi-original.yml: missing info object"
   ],
-  "notes": [],
-  "skipped": []
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "aito-technologies-openapi-original.yml: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "aito-technologies-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aito-technologies-query-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "aito-technologies-schema-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
