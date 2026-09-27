@@ -49,7 +49,7 @@ image: https://console.aito.ai/aito-favicon-128.png
 tags:
 - Company
 - Predictive Database
-- Machine-Learning
+- Machine Learning
 - Artificial Intelligence
 - Recommendations
 - Search
@@ -66,9 +66,10 @@ tags_raw:
 - Predictive Analytics
 - Automation
 - Data
+- Machine-Learning
 apis:
 - aid: aito-technologies:aito-technologies-data-api
-  name: Aito Technologies data API
+  name: Aito Technologies Data API
   description: The data API from Aito Technologies — 7 operation(s) for data.
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
@@ -84,7 +85,7 @@ apis:
   - type: Authentication
     url: authentication/aito-technologies-authentication.yml
 - aid: aito-technologies:aito-technologies-query-api
-  name: Aito Technologies query API
+  name: Aito Technologies Query API
   description: The query API from Aito Technologies — 15 operation(s) for query.
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
@@ -100,7 +101,7 @@ apis:
   - type: Authentication
     url: authentication/aito-technologies-authentication.yml
 - aid: aito-technologies:aito-technologies-schema-api
-  name: Aito Technologies schema API
+  name: Aito Technologies Schema API
   description: The schema API from Aito Technologies — 5 operation(s) for schema.
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai

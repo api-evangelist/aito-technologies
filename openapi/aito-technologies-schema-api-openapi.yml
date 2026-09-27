@@ -25,7 +25,7 @@ paths:
       tags:
       - Schema
       description: Initialize the database with a new schema.
-      operationId: schema
+      operationId: putApiV1Schema
       requestBody:
         description: The aito schema definition
         required: true
@@ -42,11 +42,13 @@ paths:
                 $ref: '#/components/schemas/UserDefinedDatabaseSchema'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
     delete:
       tags:
       - Schema
       description: Delete the entire schema and drop the stored data.
-      operationId: schema
+      operationId: deleteApiV1Schema
       responses:
         200:
           description: The summary of deletion
@@ -56,12 +58,14 @@ paths:
                 $ref: '#/components/schemas/DeleteSchemaResponse'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
   /api/v1/schema/{table}:
     get:
       tags:
       - Schema
       description: Return the schema of the specified table.
-      operationId: schema
+      operationId: getApiV1SchemaByTable
       parameters:
       - $ref: '#/components/parameters/Table'
       responses:
@@ -73,11 +77,13 @@ paths:
                 $ref: '#/components/schemas/UserDefinedTableSchema'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
     put:
       tags:
       - Schema
       description: 'Add the specified table to the schema. **NOTE**: If a table with the same name exists in the database, the operation deletes all data in this table and updates the table with the specified schema.'
-      operationId: schema
+      operationId: putApiV1SchemaByTable
       parameters:
       - $ref: '#/components/parameters/Table'
       requestBody:
@@ -96,11 +102,13 @@ paths:
                 $ref: '#/components/schemas/UserDefinedTableSchema'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
     delete:
       tags:
       - Schema
       description: Deletes the specified table from the database.
-      operationId: schema
+      operationId: deleteApiV1SchemaByTable
       parameters:
       - $ref: '#/components/parameters/Table'
       responses:
@@ -112,12 +120,14 @@ paths:
                 $ref: '#/components/schemas/DeleteSchemaResponse'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
   /api/v1/schema/{table}/{column}:
     get:
       tags:
       - Schema
       description: Return the schema of the specified column.
-      operationId: schema
+      operationId: getApiV1SchemaByTableByColumn
       parameters:
       - $ref: '#/components/parameters/Table'
       - $ref: '#/components/parameters/Column'
@@ -130,11 +140,13 @@ paths:
                 $ref: '#/components/schemas/ColumnType'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
     put:
       tags:
       - Schema
       description: Add or replace the specified column using the given schema.
-      operationId: schema
+      operationId: putApiV1SchemaByTableByColumn
       parameters:
       - $ref: '#/components/parameters/Table'
       - $ref: '#/components/parameters/Column'
@@ -154,11 +166,13 @@ paths:
                 $ref: '#/components/schemas/ColumnType'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
     delete:
       tags:
       - Schema
       description: Delete the specified column from a table.
-      operationId: schema
+      operationId: deleteApiV1SchemaByTableByColumn
       parameters:
       - $ref: '#/components/parameters/Table'
       - $ref: '#/components/parameters/Column'
@@ -171,6 +185,8 @@ paths:
                 $ref: '#/components/schemas/DeleteSchemaResponse'
       summary: Schema
       x-summary-source: derived
+      x-operation-id-source: normalized
+      x-operation-id-original: schema
   /api/v1/schema/_rename:
     post:
       tags:
@@ -217,30 +233,36 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    AliasAnalyzer:
-      type: string
-      examples:
-      - standard
-      - whitespace
-      - english
-      - en
-    FromTablemodify:
-      example: impressions
-      examples:
-      - impressions
-      - products
-      - customers
-      - messages
-      type: string
-    BooleanType:
+    EmptyDocument:
       type: object
-      description: '"Boolean column type.
-
-        When column is a boolean, the only accepted values are `true` and `false`."
-
-        '
+      required: null
+      properties: null
+    RenameTableOperation:
+      type: object
       example:
-        type: boolean
+        from: old_table
+        rename: new_table
+      required:
+      - from
+      - rename
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The table to rename
+        rename:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The name of the renamed table
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    DecimalType:
+      type: object
+      description: Decimal column type.
+      example:
+        type: Decimal
       required:
       - type
       properties:
@@ -248,7 +270,7 @@ components:
           description: Type of the column.
           type: string
           enum:
-          - boolean
+          - decimal
         nullable:
           description: When true, `null` values are allowed.
           type: boolean
@@ -299,42 +321,6 @@ components:
           properties:
             <yourTableName>:
               $ref: '#/components/schemas/UserDefinedTableSchema'
-    ArrayType:
-      type: object
-      description: '"Array column type.
-
-        Arrays contain ordered lists of primitive values of a single type.
-
-        Supported item types: Int (Int[]), Long (Long[]), Decimal (Decimal[]), Boolean (Boolean[]), String (String[]).
-
-        Arrays are useful for storing multi-valued attributes like tags, categories, or feature vectors."
-
-        '
-      example:
-        type: Int[]
-      examples:
-      - type: Int[]
-      - type:
-        - String[]
-        - 'null'
-      - type: Decimal[]
-      - type: Boolean[]
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column. Use Type[] syntax for arrays, e.g., Int[], String[].
-          type: string
-          enum:
-          - Int[]
-          - Long[]
-          - Decimal[]
-          - String[]
-          - Boolean[]
-        nullable:
-          description: When true, `null` values are allowed for the entire array.
-          type: boolean
-          default: true
     Analyzer:
       oneOf:
       - $ref: '#/components/schemas/DelimiterAnalyzer'
@@ -358,157 +344,54 @@ components:
         source: english
         minGram: 1
         maxGram: 2
-    IntType:
-      type: object
-      description: '"Integer column type."
+    FromTablemodify:
+      example: impressions
+      examples:
+      - impressions
+      - products
+      - customers
+      - messages
+      type: string
+    DeleteSchemaResponse:
+      description: '"Deleted tables."
 
         '
-      example:
-        type: Int
-      examples:
-      - type: Int
-      - type: Int
-        link: users.id
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - int
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    RenameTableOperation:
       type: object
-      example:
-        from: old_table
-        rename: new_table
       required:
-      - from
-      - rename
+      - deleted
+      example:
+        deleted:
+        - products
       properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The table to rename
-        rename:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The name of the renamed table
-        replace:
-          type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
-    TokenNGramAnalyzer:
+        deleted:
+          type: array
+          items:
+            type: string
+          description: Array of table names deleted.
+    CharNGramAnalyzer:
       type: object
       required:
       - type
-      - source
       - minGram
       - maxGram
-      examples:
-      - type: token-ngram
-        source: english
-        minGram: 1
-        maxGram: 2
-      - type: token-ngram
-        source:
-          type: delimiter
-          delimiter: ','
-        minGram: 1
+      example:
+        type: char-ngram
+        minGram: 2
         maxGram: 3
-        tokenSeparator: _
       properties:
         type:
           description: Type of the analyzer.
           type: string
           enum:
-          - token-ngram
-        source:
-          description: Source analyzer to generate features before being combined into n-grams.
-          $ref: '#/components/schemas/Analyzer'
+          - char-ngram
         minGram:
-          description: The minimum number of features to be combined.
+          description: The minimum length of characters in a feature.
           type: integer
           format: int32
         maxGram:
-          description: The maximum number of features to be combined.
+          description: The maximum length of characters in a feature.
           type: integer
           format: int32
-        tokenSeparator:
-          description: The string used to join the features of the source analyzer.
-          type: string
-          default: '" "'
-    TextType:
-      type: object
-      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
-      example:
-        type: Text
-        analyzer: English
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - text
-        analyzer:
-          $ref: '#/components/schemas/Analyzer'
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    DecimalType:
-      type: object
-      description: Decimal column type.
-      example:
-        type: Decimal
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - decimal
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    EmptyDocument:
-      type: object
-      required: null
-      properties: null
-    NewColumnType:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/ColumnType'
-      - type: object
-        properties:
-          value:
-            description: Value that existing rows get. Optional if the column is nullable or the table is empty.
-            oneOf:
-            - type: integer
-            - type: number
-            - type: boolean
-            - type: 'null'
-            - type: string
     ColumnType:
       type: object
       description: '"Type of the column.
@@ -556,79 +439,42 @@ components:
           Decimal[]: '#/components/schemas/ArrayType'
           String[]: '#/components/schemas/ArrayType'
           Boolean[]: '#/components/schemas/ArrayType'
-    StringType:
+    ArrayType:
       type: object
-      description: '"String column type.
+      description: '"Array column type.
 
-        The string data type is a primitive version of the Text type.
+        Arrays contain ordered lists of primitive values of a single type.
 
-        The value is turned into a single feature. For example `"lazy black cat"` becomes 1
+        Supported item types: Int (Int[]), Long (Long[]), Decimal (Decimal[]), Boolean (Boolean[]), String (String[]).
 
-        feature: `"lazy black cat"`."
+        Arrays are useful for storing multi-valued attributes like tags, categories, or feature vectors."
 
         '
       example:
-        type: String
+        type: Int[]
       examples:
-      - type: String
-      - type: String
-        link: messages.id
+      - type: Int[]
+      - type:
+        - String[]
+        - 'null'
+      - type: Decimal[]
+      - type: Boolean[]
       required:
       - type
       properties:
         type:
-          description: Type of the column.
+          description: Type of the column. Use Type[] syntax for arrays, e.g., Int[], String[].
           type: string
           enum:
-          - string
+          - Int[]
+          - Long[]
+          - Decimal[]
+          - String[]
+          - Boolean[]
         nullable:
-          description: When true, `null` values are allowed.
+          description: When true, `null` values are allowed for the entire array.
           type: boolean
           default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    CharNGramAnalyzer:
-      type: object
-      required:
-      - type
-      - minGram
-      - maxGram
-      example:
-        type: char-ngram
-        minGram: 2
-        maxGram: 3
-      properties:
-        type:
-          description: Type of the analyzer.
-          type: string
-          enum:
-          - char-ngram
-        minGram:
-          description: The minimum length of characters in a feature.
-          type: integer
-          format: int32
-        maxGram:
-          description: The maximum length of characters in a feature.
-          type: integer
-          format: int32
-    DeleteSchemaResponse:
-      description: '"Deleted tables."
-
-        '
-      type: object
-      required:
-      - deleted
-      example:
-        deleted:
-        - products
-      properties:
-        deleted:
-          type: array
-          items:
-            type: string
-          description: Array of table names deleted.
     UserDefinedTableSchema:
       type: object
       description: '"Any schema which is a valid Aito table schema.
@@ -668,27 +514,38 @@ components:
           properties:
             <yourColumnName>:
               $ref: '#/components/schemas/ColumnType'
-    CopyTableOperation:
+    AliasAnalyzer:
+      type: string
+      examples:
+      - standard
+      - whitespace
+      - english
+      - en
+    BooleanType:
       type: object
+      description: '"Boolean column type.
+
+        When column is a boolean, the only accepted values are `true` and `false`."
+
+        '
       example:
-        copy: new_table
-        from: old_table
+        type: boolean
       required:
-      - from
-      - copy
+      - type
       properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The existing table to copy
-        copy:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The target name of the new copy
-        replace:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - boolean
+        nullable:
+          description: When true, `null` values are allowed.
           type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
     JsonType:
       type: object
       description: '"Json column type.
@@ -714,6 +571,60 @@ components:
           type: string
           enum:
           - json
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    CopyTableOperation:
+      type: object
+      example:
+        copy: new_table
+        from: old_table
+      required:
+      - from
+      - copy
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The existing table to copy
+        copy:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The target name of the new copy
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    StringType:
+      type: object
+      description: '"String column type.
+
+        The string data type is a primitive version of the Text type.
+
+        The value is turned into a single feature. For example `"lazy black cat"` becomes 1
+
+        feature: `"lazy black cat"`."
+
+        '
+      example:
+        type: String
+      examples:
+      - type: String
+      - type: String
+        link: messages.id
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - string
         nullable:
           description: When true, `null` values are allowed.
           type: boolean
@@ -748,6 +659,87 @@ components:
           description: Trims leading and trailing whitespace of the features
           type: boolean
           default: true
+    IntType:
+      type: object
+      description: '"Integer column type."
+
+        '
+      example:
+        type: Int
+      examples:
+      - type: Int
+      - type: Int
+        link: users.id
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - int
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    NewColumnType:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ColumnType'
+      - type: object
+        properties:
+          value:
+            description: Value that existing rows get. Optional if the column is nullable or the table is empty.
+            oneOf:
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: 'null'
+            - type: string
+    TokenNGramAnalyzer:
+      type: object
+      required:
+      - type
+      - source
+      - minGram
+      - maxGram
+      examples:
+      - type: token-ngram
+        source: english
+        minGram: 1
+        maxGram: 2
+      - type: token-ngram
+        source:
+          type: delimiter
+          delimiter: ','
+        minGram: 1
+        maxGram: 3
+        tokenSeparator: _
+      properties:
+        type:
+          description: Type of the analyzer.
+          type: string
+          enum:
+          - token-ngram
+        source:
+          description: Source analyzer to generate features before being combined into n-grams.
+          $ref: '#/components/schemas/Analyzer'
+        minGram:
+          description: The minimum number of features to be combined.
+          type: integer
+          format: int32
+        maxGram:
+          description: The maximum number of features to be combined.
+          type: integer
+          format: int32
+        tokenSeparator:
+          description: The string used to join the features of the source analyzer.
+          type: string
+          default: '" "'
     LanguageAnalyzer:
       type: object
       required:
@@ -788,19 +780,43 @@ components:
           default: []
           items:
             type: string
+    TextType:
+      type: object
+      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
+      example:
+        type: Text
+        analyzer: English
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - text
+        analyzer:
+          $ref: '#/components/schemas/Analyzer'
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
   parameters:
-    Column:
-      name: table
-      in: path
-      required: true
-      description: The name of the column
-      schema:
-        type: string
     Table:
       name: table
       in: path
       required: true
       description: The name of the table to add data to
+      schema:
+        type: string
+    Column:
+      name: table
+      in: path
+      required: true
+      description: The name of the column
       schema:
         type: string
   securitySchemes:
