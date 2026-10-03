@@ -198,604 +198,46 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    Json:
+    OnPropositionObject:
       type: object
-      properties:
-        $json:
-          type: object
-    Or:
       example:
-        $or:
-        - tags: cover
-        - tags: laptop
-      examples:
-      - $or:
-        - tags: cover
-        - tags: laptop
-      - from: products
-        where:
-          price:
-            $or:
-            - $lt: 0.9
-            - $gt: 2.1
-      type: object
+        'on':
+          user.tags: nyc
+        prop:
+          click: true
+      required:
+      - prop
+      - 'on'
       properties:
-        $or:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/Proposition'
-            - $ref: '#/components/schemas/PrimitiveProposition'
-    Knn:
-      example:
-        $knn:
-        - 4
-        - tags: laptop
-      examples:
-      - $knn:
-        - 4
-        - tags: laptop
-      - $knn:
-          k: 4
-          near:
-            tags: laptop
-      type: object
-      properties:
-        $knn:
-          oneOf:
-          - $ref: '#/components/schemas/KnnPropositionObject'
-          - $ref: '#/components/schemas/KnnPropositionArray'
-    Hash:
-      example:
-        $hash:
-          $mod:
-          - 2
-          - 1
-      type: object
-      properties:
-        $hash:
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    Atomic:
-      example:
-        $atomic:
-          tags: pen
-          price:
-            $gte: 200
-      examples:
-      - $atomic:
-          tags: pen
-          price:
-            $gte: 200
-      - from: products
-        where:
-          $atomic:
-            tags: pen
-            price:
-              $gte: 200
-      type: object
-      properties:
-        $atomic:
+        prop:
+          example:
+            click: true
           $ref: '#/components/schemas/Proposition'
-    GetValueExpression:
-      example:
-        $get: query
-      examples:
-      - $get: query
-      - $get: click
-      - $get: product.title
-      type: object
-      properties:
-        $get:
-          type: string
-    RenameTableOperation:
+        'on':
+          example:
+            user.tags: nyc
+          $ref: '#/components/schemas/Proposition'
+    CopyTableOperation:
       type: object
       example:
+        copy: new_table
         from: old_table
-        rename: new_table
       required:
       - from
-      - rename
+      - copy
       properties:
         from:
           example: old_table
           $ref: '#/components/schemas/FromTablemodify'
-          description: The table to rename
-        rename:
+          description: The existing table to copy
+        copy:
           example: new_table
           $ref: '#/components/schemas/FromTablemodify'
-          description: The name of the renamed table
+          description: The target name of the new copy
         replace:
           type: boolean
           description: If replace is true, operation will overwrite any existing table
           default: false
-    DeleteOperationResponse:
-      type: object
-      required:
-      - total
-      properties:
-        total:
-          description: 'The number of rows that was deleted
-
-            '
-          type: integer
-          format: int64
-    ModPropositionObject:
-      type: object
-      example:
-        divisor: 2
-        remainder: 0
-      required:
-      - divisor
-      - remainder
-      properties:
-        divisor:
-          example: 2
-          type: integer
-          format: int64
-        remainder:
-          example: 0
-          type: integer
-          format: int64
-    Proposition:
-      example:
-        customer: 4
-        query:
-          $match: laptop
-      examples:
-      - customer: 4
-        query:
-          $match: laptop
-      - price:
-          $gte: 50
-          $lt: 100
-      - tags:
-          $match: laptop
-      type: object
-      oneOf:
-      - $ref: '#/components/schemas/Is'
-      - $ref: '#/components/schemas/And'
-      - $ref: '#/components/schemas/Atomic'
-      - $ref: '#/components/schemas/Or'
-      - $ref: '#/components/schemas/Not'
-      - $ref: '#/components/schemas/Defined'
-      - $ref: '#/components/schemas/Has'
-      - $ref: '#/components/schemas/Exists'
-      - $ref: '#/components/schemas/Match'
-      - $ref: '#/components/schemas/StartsWith'
-      - $ref: '#/components/schemas/On'
-      - $ref: '#/components/schemas/Hash'
-      - $ref: '#/components/schemas/Mod'
-      - $ref: '#/components/schemas/Gt'
-      - $ref: '#/components/schemas/Gte'
-      - $ref: '#/components/schemas/Lt'
-      - $ref: '#/components/schemas/Lte'
-      - $ref: '#/components/schemas/Context'
-      - $ref: '#/components/schemas/Knn'
-      - $ref: '#/components/schemas/Nn'
-      - $ref: '#/components/schemas/Numeric'
-      - oneOf:
-        - $ref: '#/components/schemas/ToString'
-        - $ref: '#/components/schemas/GetValueExpression'
-      - $ref: '#/components/schemas/FieldProposition'
-    And:
-      example:
-        $and:
-        - $gt: 10
-        - $lt: 20
-      examples:
-      - $and:
-        - $gt: 10
-        - $lt: 20
-      - from: products
-        where:
-          price:
-            $and:
-            - $gt: 1.5
-            - $lt: 2.1
-      type: object
-      properties:
-        $and:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/Proposition'
-            - $ref: '#/components/schemas/PrimitiveProposition'
-    PropositionSet:
-      example: product.tags
-      examples:
-      - product.tags
-      - query
-      - product
-      - tags
-      oneOf:
-      - type: array
-        items:
-          $ref: '#/components/schemas/PropositionSet'
-      - type: string
-      - $ref: '#/components/schemas/Proposition'
-    Lt:
-      example:
-        $lt: 4
-      examples:
-      - $lt: 4
-      - $lt: -12.1
-      - $lt: '20180502'
-      - from: products
-        where:
-          price:
-            $lt: 1.24
-      type: object
-      properties:
-        $lt:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    PrimitiveProposition:
-      example: 4
-      examples:
-      - 4
-      - 3.1
-      - false
-      - null
-      - text
-      oneOf:
-      - $ref: '#/components/schemas/GetValueExpression'
-      - type: integer
-        format: int32
-      - type: integer
-        format: int64
-      - type: number
-      - type: 'null'
-      - $ref: '#/components/schemas/ArrayValue'
-      - $ref: '#/components/schemas/ToString'
-      - type: boolean
-      - type: string
-      - $ref: '#/components/schemas/Json'
-    Nn:
-      example:
-        $nn:
-        - tags: laptop
-      examples:
-      - $nn:
-        - tags: laptop
-      - $nn:
-          near:
-            tags: laptop
-      type: object
-      properties:
-        $nn:
-          oneOf:
-          - $ref: '#/components/schemas/NnPropositionObject'
-          - $ref: '#/components/schemas/NnPropositionArray'
-    FromTablemodify:
-      example: impressions
-      examples:
-      - impressions
-      - products
-      - customers
-      - messages
-      type: string
-    Mod:
-      example:
-        $mod:
-        - 2
-        - 0
-      examples:
-      - $mod:
-        - 2
-        - 0
-      - $mod:
-          divisor: 2
-          remainder: 0
-      - from: products
-        where:
-          price:
-            $mod:
-              divisor: 2
-              remainder: 0
-      type: object
-      properties:
-        $mod:
-          oneOf:
-          - $ref: '#/components/schemas/ModPropositionObject'
-          - $ref: '#/components/schemas/ModPropositionArray'
-    Gte:
-      example:
-        $gte: -2
-      examples:
-      - $gte: -2
-      - $gte: 0
-      - $gte: '20180502'
-      - from: products
-        where:
-          price:
-            $gte: 2
-      type: object
-      properties:
-        $gte:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    Not:
-      example:
-        $not:
-          tags: laptop
-      examples:
-      - $not:
-          tags: laptop
-      - $not:
-          $lt: 0
-      - from: products
-        where:
-          price:
-            $not:
-              $lt: 1.1
-      type: object
-      properties:
-        $not:
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    UserDefinedObjectInternalWrapper:
-      type: object
-      description: Any object which is valid according to the database schema.
-      oneOf:
-      - $ref: '#/components/schemas/UserDefinedObject'
-    ModPropositionArray:
-      example:
-      - 2
-      - 0
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        type: integer
-        format: int64
-    InsertOperation:
-      type: object
-      example:
-        insert:
-          age: 30
-          name: Alice
-        into: users
-      required:
-      - into
-      - insert
-      properties:
-        into:
-          example: users
-          type: string
-          description: Table to insert into
-        insert:
-          example:
-            age: 30
-            name: Alice
-          type: object
-          description: Documents to insert (single document or array of documents as JSON)
-    ToString:
-      example:
-        $toString: 4
-      type: object
-      properties:
-        $toString:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    FileUploadProcessTriggerResponse:
-      description: Processing started status.
-      type: object
-      required:
-      - id
-      - status
-      properties:
-        id:
-          type: string
-          description: The id of the operation. Should match the one in the url parameter.
-        status:
-          type: string
-          enum:
-          - started
-          - inprogress
-          - finished
-          description: Textual description of the job.
-    KnnPropositionObject:
-      type: object
-      example:
-        k: 4
-        near:
-          tags: laptop
-      required:
-      - k
-      - near
-      properties:
-        k:
-          example: 4
-          type: integer
-          format: int32
-        near:
-          example:
-            tags: laptop
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    Match:
-      example:
-        $match: coffee
-      examples:
-      - $match: coffee
-      - from: products
-        where:
-          name:
-            $match: coffee
-      type: object
-      properties:
-        $match:
-          oneOf:
-          - $ref: '#/components/schemas/ToString'
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: string
-    StartsWith:
-      example:
-        $startsWith: Cucumber
-      examples:
-      - $startsWith: Cucumber
-      - from: products
-        where:
-          name:
-            $startsWith: Cucumber
-      type: object
-      properties:
-        $startsWith:
-          oneOf:
-          - $ref: '#/components/schemas/ToString'
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: string
-    AnyModification:
-      oneOf:
-      - $ref: '#/components/schemas/InsertOperation'
-      - $ref: '#/components/schemas/UpdateOperation'
-      - $ref: '#/components/schemas/DeleteOperation2'
-      - $ref: '#/components/schemas/OptimizeOperation2'
-      - $ref: '#/components/schemas/RenameTableOperation'
-      - $ref: '#/components/schemas/CopyTableOperation'
-      - $ref: '#/components/schemas/OperationsWrapper'
-    Context:
-      example:
-        $context:
-          click: true
-      examples:
-      - $context:
-          click: true
-      - from: impressions
-        where:
-          customerEmail: john.doe@aito.ai
-          query: laptop
-        get: product
-        orderBy:
-          $p:
-            $context:
-              click: true
-      type: object
-      properties:
-        $context:
-          $ref: '#/components/schemas/Proposition'
-    NnPropositionObject:
-      type: object
-      example:
-        near:
-          tags: laptop
-      required:
-      - near
-      properties:
-        near:
-          example:
-            tags: laptop
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-        threshold:
-          type: number
-    'On':
-      example:
-        $on:
-          prop:
-            click: true
-          'on':
-            user.tags: nyc
-      examples:
-      - $on:
-          prop:
-            click: true
-          'on':
-            user.tags: nyc
-      - $on:
-        - click: true
-        - user.tags: nyc
-      type: object
-      properties:
-        $on:
-          oneOf:
-          - $ref: '#/components/schemas/OnPropositionObject'
-          - $ref: '#/components/schemas/OnPropositionArray'
-    FieldProposition:
-      type: object
-      required:
-      - fieldName
-      properties:
-        fieldName:
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    Is:
-      example:
-        $is: value
-      type: object
-      properties:
-        $is:
-          $ref: '#/components/schemas/PrimitiveProposition'
-    NnPropositionArray:
-      example:
-      - tags: laptop
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        oneOf:
-        - oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-        - type: number
-    DeleteOperation2:
-      type: object
-      example:
-        delete:
-          id: 4
-        from: users
-      required:
-      - from
-      - delete
-      properties:
-        from:
-          example: users
-          type: string
-          description: Table to delete from
-        delete:
-          example:
-            id: 4
-          $ref: '#/components/schemas/Proposition'
-          description: Conditions to match rows for deletion
     FileUploadProcessStatusResponse:
       description: The file processing status.
       type: object
@@ -853,49 +295,278 @@ components:
               items:
                 $ref: '#/components/schemas/UserDefinedObject'
               description: Array of failing elements. The number of returned elements is restricted.
-    UpdateOperation:
+    OptimizeOperation:
+      type: object
+      example: {}
+      properties: null
+    KnnPropositionObject:
       type: object
       example:
-        set:
-          archived: true
-        update: users
-        where:
-          status: inactive
+        k: 4
+        near:
+          tags: laptop
       required:
-      - update
-      - set
-      - where
+      - k
+      - near
       properties:
-        update:
-          example: users
-          type: string
-          description: Table to update
-        set:
+        k:
+          example: 4
+          type: integer
+          format: int32
+        near:
           example:
-            archived: true
-          type: object
-          description: Fields to update with new values (JSON object mapping field names to new values)
+            tags: laptop
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    ModPropositionObject:
+      type: object
+      example:
+        divisor: 2
+        remainder: 0
+      required:
+      - divisor
+      - remainder
+      properties:
+        divisor:
+          example: 2
+          type: integer
+          format: int64
+        remainder:
+          example: 0
+          type: integer
+          format: int64
+    Gt:
+      example:
+        $gt: 8
+      examples:
+      - $gt: 8
+      - $gt: 231.1
+      - $gt: '20150308'
+      - from: products
         where:
-          example:
-            status: inactive
-          $ref: '#/components/schemas/Proposition'
-          description: Conditions to match rows for update
-        upsert:
-          type: boolean
-          description: If true, insert if no match found (upsert)
-          default: false
-    ArrayValue:
+          price:
+            $gt: 2.14
+      type: object
+      properties:
+        $gt:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Proposition:
+      example:
+        customer: 4
+        query:
+          $match: laptop
+      examples:
+      - customer: 4
+        query:
+          $match: laptop
+      - price:
+          $gte: 50
+          $lt: 100
+      - tags:
+          $match: laptop
+      type: object
       oneOf:
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
+      - $ref: '#/components/schemas/Is'
+      - $ref: '#/components/schemas/And'
+      - $ref: '#/components/schemas/Atomic'
+      - $ref: '#/components/schemas/Or'
+      - $ref: '#/components/schemas/Not'
+      - $ref: '#/components/schemas/Defined'
+      - $ref: '#/components/schemas/Has'
+      - $ref: '#/components/schemas/Exists'
+      - $ref: '#/components/schemas/Match'
+      - $ref: '#/components/schemas/StartsWith'
+      - $ref: '#/components/schemas/On'
+      - $ref: '#/components/schemas/Hash'
+      - $ref: '#/components/schemas/Mod'
+      - $ref: '#/components/schemas/Gt'
+      - $ref: '#/components/schemas/Gte'
+      - $ref: '#/components/schemas/Lt'
+      - $ref: '#/components/schemas/Lte'
+      - $ref: '#/components/schemas/Context'
+      - $ref: '#/components/schemas/Knn'
+      - $ref: '#/components/schemas/Nn'
+      - $ref: '#/components/schemas/Numeric'
+      - oneOf:
+        - $ref: '#/components/schemas/ToString'
+        - $ref: '#/components/schemas/GetValueExpression'
+      - $ref: '#/components/schemas/FieldProposition'
+    ToString:
+      example:
+        $toString: 4
+      type: object
+      properties:
+        $toString:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Is:
+      example:
+        $is: value
+      type: object
+      properties:
+        $is:
+          $ref: '#/components/schemas/PrimitiveProposition'
+    Atomic:
+      example:
+        $atomic:
+          tags: pen
+          price:
+            $gte: 200
+      examples:
+      - $atomic:
+          tags: pen
+          price:
+            $gte: 200
+      - from: products
+        where:
+          $atomic:
+            tags: pen
+            price:
+              $gte: 200
+      type: object
+      properties:
+        $atomic:
+          $ref: '#/components/schemas/Proposition'
+    Match:
+      example:
+        $match: coffee
+      examples:
+      - $match: coffee
+      - from: products
+        where:
+          name:
+            $match: coffee
+      type: object
+      properties:
+        $match:
+          oneOf:
+          - $ref: '#/components/schemas/ToString'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: string
+    'On':
+      example:
+        $on:
+          prop:
+            click: true
+          'on':
+            user.tags: nyc
+      examples:
+      - $on:
+          prop:
+            click: true
+          'on':
+            user.tags: nyc
+      - $on:
+        - click: true
+        - user.tags: nyc
+      type: object
+      properties:
+        $on:
+          oneOf:
+          - $ref: '#/components/schemas/OnPropositionObject'
+          - $ref: '#/components/schemas/OnPropositionArray'
+    And:
+      example:
+        $and:
+        - $gt: 10
+        - $lt: 20
+      examples:
+      - $and:
+        - $gt: 10
+        - $lt: 20
+      - from: products
+        where:
+          price:
+            $and:
+            - $gt: 1.5
+            - $lt: 2.1
+      type: object
+      properties:
+        $and:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Proposition'
+            - $ref: '#/components/schemas/PrimitiveProposition'
+    Lte:
+      example:
+        $lte: 8
+      examples:
+      - $lte: 8
+      - $lte: 0
+      - $lte: '20180502'
+      - from: products
+        where:
+          price:
+            $lte: 1
+      type: object
+      properties:
+        $lte:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Json:
+      type: object
+      properties:
+        $json:
+          type: object
+    Or:
+      example:
+        $or:
+        - tags: cover
+        - tags: laptop
+      examples:
+      - $or:
+        - tags: cover
+        - tags: laptop
+      - from: products
+        where:
+          price:
+            $or:
+            - $lt: 0.9
+            - $gt: 2.1
+      type: object
+      properties:
+        $or:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Proposition'
+            - $ref: '#/components/schemas/PrimitiveProposition'
     Numeric:
       example:
         $numeric: 42
@@ -913,69 +584,210 @@ components:
             format: int64
           - type: number
           - type: 'null'
-    DeleteOperation:
+    UserDefinedObjectInternalWrapper:
+      type: object
+      description: Any object which is valid according to the database schema.
+      oneOf:
+      - $ref: '#/components/schemas/UserDefinedObject'
+    RenameTableOperation:
       type: object
       example:
-        from: user
-        where:
-          id: 4
-      required:
-      - from
-      - where
-      properties:
-        from:
-          example: user
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The modified table
-        where:
-          example:
-            id: 4
-          $ref: '#/components/schemas/Proposition'
-          description: The entries to delete
-    CopyTableOperation:
-      type: object
-      example:
-        copy: new_table
         from: old_table
+        rename: new_table
       required:
       - from
-      - copy
+      - rename
       properties:
         from:
           example: old_table
           $ref: '#/components/schemas/FromTablemodify'
-          description: The existing table to copy
-        copy:
+          description: The table to rename
+        rename:
           example: new_table
           $ref: '#/components/schemas/FromTablemodify'
-          description: The target name of the new copy
+          description: The name of the renamed table
         replace:
           type: boolean
           description: If replace is true, operation will overwrite any existing table
           default: false
-    Exists:
+    InsertOperation:
+      type: object
       example:
-        $exists:
-        - query
-        - product.tags
+        insert:
+          age: 30
+          name: Alice
+        into: users
+      required:
+      - into
+      - insert
+      properties:
+        into:
+          example: users
+          type: string
+          description: Table to insert into
+        insert:
+          example:
+            age: 30
+            name: Alice
+          type: object
+          description: Documents to insert (single document or array of documents as JSON)
+    NnPropositionArray:
+      example:
+      - tags: laptop
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        oneOf:
+        - oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+        - type: number
+    FieldProposition:
+      type: object
+      required:
+      - fieldName
+      properties:
+        fieldName:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    DeleteOperationResponse:
+      type: object
+      required:
+      - total
+      properties:
+        total:
+          description: 'The number of rows that was deleted
+
+            '
+          type: integer
+          format: int64
+    Lt:
+      example:
+        $lt: 4
       examples:
-      - $exists:
-        - query
-        - product.tags
-      - from: impressions
+      - $lt: 4
+      - $lt: -12.1
+      - $lt: '20180502'
+      - from: products
         where:
-          $on:
-          - $exists:
-            - query
-            - customer.tags
-          - click: true
-        relate:
-        - product.title
-        - product.tags
+          price:
+            $lt: 1.24
       type: object
       properties:
-        $exists:
+        $lt:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Context:
+      example:
+        $context:
+          click: true
+      examples:
+      - $context:
+          click: true
+      - from: impressions
+        where:
+          customerEmail: john.doe@aito.ai
+          query: laptop
+        get: product
+        orderBy:
+          $p:
+            $context:
+              click: true
+      type: object
+      properties:
+        $context:
+          $ref: '#/components/schemas/Proposition'
+    AnyModification:
+      oneOf:
+      - $ref: '#/components/schemas/InsertOperation'
+      - $ref: '#/components/schemas/UpdateOperation'
+      - $ref: '#/components/schemas/DeleteOperation2'
+      - $ref: '#/components/schemas/OptimizeOperation2'
+      - $ref: '#/components/schemas/RenameTableOperation'
+      - $ref: '#/components/schemas/CopyTableOperation'
+      - $ref: '#/components/schemas/OperationsWrapper'
+    Nn:
+      example:
+        $nn:
+        - tags: laptop
+      examples:
+      - $nn:
+        - tags: laptop
+      - $nn:
+          near:
+            tags: laptop
+      type: object
+      properties:
+        $nn:
+          oneOf:
+          - $ref: '#/components/schemas/NnPropositionObject'
+          - $ref: '#/components/schemas/NnPropositionArray'
+    GetValueExpression:
+      example:
+        $get: query
+      examples:
+      - $get: query
+      - $get: click
+      - $get: product.title
+      type: object
+      properties:
+        $get:
+          type: string
+    PropositionSet:
+      example: product.tags
+      examples:
+      - product.tags
+      - query
+      - product
+      - tags
+      oneOf:
+      - type: array
+        items:
           $ref: '#/components/schemas/PropositionSet'
+      - type: string
+      - $ref: '#/components/schemas/Proposition'
+    NnPropositionObject:
+      type: object
+      example:
+        near:
+          tags: laptop
+      required:
+      - near
+      properties:
+        near:
+          example:
+            tags: laptop
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+        threshold:
+          type: number
+    OnPropositionArray:
+      example:
+      - click: true
+      - user.tags: nyc
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        $ref: '#/components/schemas/Proposition'
+    OptimizeOperationResponse:
+      type: object
+      example: {}
+      properties: null
     OperationsWrapper:
       type: object
       example:
@@ -1015,96 +827,124 @@ components:
           items:
             $ref: '#/components/schemas/AnyModification'
           description: List of modification operations to execute atomically
+    StartsWith:
+      example:
+        $startsWith: Cucumber
+      examples:
+      - $startsWith: Cucumber
+      - from: products
+        where:
+          name:
+            $startsWith: Cucumber
+      type: object
+      properties:
+        $startsWith:
+          oneOf:
+          - $ref: '#/components/schemas/ToString'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: string
     UserDefinedObject:
       example:
         name: My product
         price: 172.19
       type: object
-    OptimizeOperationResponse:
-      type: object
-      example: {}
-      properties: null
-    KnnPropositionArray:
+    Defined:
       example:
-      - 4
-      - tags: laptop
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        oneOf:
-        - type: integer
-          format: int32
-        - oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    Has:
-      example:
-        $has: drink
-      examples:
-      - $has: drink
-      - from: products
-        where:
-          tags:
-            $has: drink
+        $defined: true
       type: object
       properties:
-        $has:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    OnPropositionArray:
-      example:
-      - click: true
-      - user.tags: nyc
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        $ref: '#/components/schemas/Proposition'
-    OnPropositionObject:
+        $defined:
+          type: boolean
+    DeleteOperation2:
       type: object
       example:
-        'on':
-          user.tags: nyc
-        prop:
-          click: true
+        delete:
+          id: 4
+        from: users
       required:
-      - prop
-      - 'on'
+      - from
+      - delete
       properties:
-        prop:
+        from:
+          example: users
+          type: string
+          description: Table to delete from
+        delete:
           example:
-            click: true
+            id: 4
           $ref: '#/components/schemas/Proposition'
-        'on':
-          example:
-            user.tags: nyc
-          $ref: '#/components/schemas/Proposition'
-    Lte:
+          description: Conditions to match rows for deletion
+    DeleteOperation:
+      type: object
       example:
-        $lte: 8
+        from: user
+        where:
+          id: 4
+      required:
+      - from
+      - where
+      properties:
+        from:
+          example: user
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The modified table
+        where:
+          example:
+            id: 4
+          $ref: '#/components/schemas/Proposition'
+          description: The entries to delete
+    Exists:
+      example:
+        $exists:
+        - query
+        - product.tags
       examples:
-      - $lte: 8
-      - $lte: 0
-      - $lte: '20180502'
+      - $exists:
+        - query
+        - product.tags
+      - from: impressions
+        where:
+          $on:
+          - $exists:
+            - query
+            - customer.tags
+          - click: true
+        relate:
+        - product.title
+        - product.tags
+      type: object
+      properties:
+        $exists:
+          $ref: '#/components/schemas/PropositionSet'
+    BatchImportResponse:
+      description: '"An array of inserted entries."
+
+        '
+      type: object
+      required:
+      - entries
+      - status
+      properties:
+        entries:
+          type: integer
+          description: How many entries were inserted.
+        status:
+          type: string
+          description: Status text
+    Gte:
+      example:
+        $gte: -2
+      examples:
+      - $gte: -2
+      - $gte: 0
+      - $gte: '20180502'
       - from: products
         where:
           price:
-            $lte: 1
+            $gte: 2
       type: object
       properties:
-        $lte:
+        $gte:
           oneOf:
           - $ref: '#/components/schemas/GetValueExpression'
           - type: integer
@@ -1154,39 +994,174 @@ components:
           type: string
           format: date-time
           description: Defines when the presigned upload link expires
-    OptimizeOperation:
+    Knn:
+      example:
+        $knn:
+        - 4
+        - tags: laptop
+      examples:
+      - $knn:
+        - 4
+        - tags: laptop
+      - $knn:
+          k: 4
+          near:
+            tags: laptop
       type: object
-      example: {}
-      properties: null
-    BatchImportResponse:
-      description: '"An array of inserted entries."
-
-        '
+      properties:
+        $knn:
+          oneOf:
+          - $ref: '#/components/schemas/KnnPropositionObject'
+          - $ref: '#/components/schemas/KnnPropositionArray'
+    ModPropositionArray:
+      example:
+      - 2
+      - 0
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    PrimitiveProposition:
+      example: 4
+      examples:
+      - 4
+      - 3.1
+      - false
+      - null
+      - text
+      oneOf:
+      - $ref: '#/components/schemas/GetValueExpression'
+      - type: integer
+        format: int32
+      - type: integer
+        format: int64
+      - type: number
+      - type: 'null'
+      - $ref: '#/components/schemas/ArrayValue'
+      - $ref: '#/components/schemas/ToString'
+      - type: boolean
+      - type: string
+      - $ref: '#/components/schemas/Json'
+    UpdateOperation:
+      type: object
+      example:
+        set:
+          archived: true
+        update: users
+        where:
+          status: inactive
+      required:
+      - update
+      - set
+      - where
+      properties:
+        update:
+          example: users
+          type: string
+          description: Table to update
+        set:
+          example:
+            archived: true
+          type: object
+          description: Fields to update with new values (JSON object mapping field names to new values)
+        where:
+          example:
+            status: inactive
+          $ref: '#/components/schemas/Proposition'
+          description: Conditions to match rows for update
+        upsert:
+          type: boolean
+          description: If true, insert if no match found (upsert)
+          default: false
+    KnnPropositionArray:
+      example:
+      - 4
+      - tags: laptop
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        oneOf:
+        - type: integer
+          format: int32
+        - oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    Hash:
+      example:
+        $hash:
+          $mod:
+          - 2
+          - 1
+      type: object
+      properties:
+        $hash:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    FileUploadProcessTriggerResponse:
+      description: Processing started status.
       type: object
       required:
-      - entries
+      - id
       - status
       properties:
-        entries:
-          type: integer
-          description: How many entries were inserted.
+        id:
+          type: string
+          description: The id of the operation. Should match the one in the url parameter.
         status:
           type: string
-          description: Status text
-    Gt:
+          enum:
+          - started
+          - inprogress
+          - finished
+          description: Textual description of the job.
+    ArrayValue:
+      oneOf:
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+    Not:
       example:
-        $gt: 8
+        $not:
+          tags: laptop
       examples:
-      - $gt: 8
-      - $gt: 231.1
-      - $gt: '20150308'
+      - $not:
+          tags: laptop
+      - $not:
+          $lt: 0
       - from: products
         where:
           price:
-            $gt: 2.14
+            $not:
+              $lt: 1.1
       type: object
       properties:
-        $gt:
+        $not:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    Has:
+      example:
+        $has: drink
+      examples:
+      - $has: drink
+      - from: products
+        where:
+          tags:
+            $has: drink
+      type: object
+      properties:
+        $has:
           oneOf:
           - $ref: '#/components/schemas/GetValueExpression'
           - type: integer
@@ -1200,13 +1175,38 @@ components:
           - type: boolean
           - type: string
           - $ref: '#/components/schemas/Json'
-    Defined:
+    FromTablemodify:
+      example: impressions
+      examples:
+      - impressions
+      - products
+      - customers
+      - messages
+      type: string
+    Mod:
       example:
-        $defined: true
+        $mod:
+        - 2
+        - 0
+      examples:
+      - $mod:
+        - 2
+        - 0
+      - $mod:
+          divisor: 2
+          remainder: 0
+      - from: products
+        where:
+          price:
+            $mod:
+              divisor: 2
+              remainder: 0
       type: object
       properties:
-        $defined:
-          type: boolean
+        $mod:
+          oneOf:
+          - $ref: '#/components/schemas/ModPropositionObject'
+          - $ref: '#/components/schemas/ModPropositionArray'
   parameters:
     Table:
       name: table
