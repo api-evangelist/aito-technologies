@@ -233,47 +233,34 @@ paths:
       x-summary-source: derived
 components:
   schemas:
-    TextType:
-      type: object
-      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
-      example:
-        type: Text
-        analyzer: English
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - text
-        analyzer:
-          $ref: '#/components/schemas/Analyzer'
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    StringType:
-      type: object
-      description: '"String column type.
-
-        The string data type is a primitive version of the Text type.
-
-        The value is turned into a single feature. For example `"lazy black cat"` becomes 1
-
-        feature: `"lazy black cat"`."
-
-        '
-      example:
-        type: String
+    Analyzer:
+      oneOf:
+      - $ref: '#/components/schemas/DelimiterAnalyzer'
+      - $ref: '#/components/schemas/CharNGramAnalyzer'
+      - $ref: '#/components/schemas/LanguageAnalyzer'
+      - $ref: '#/components/schemas/TokenNGramAnalyzer'
+      - $ref: '#/components/schemas/AliasAnalyzer'
       examples:
-      - type: String
-      - type: String
-        link: messages.id
+      - standard
+      - whitespace
+      - english
+      - en
+      - type: delimiter
+        delimiter: ','
+      - type: language
+        language: en
+      - type: char-ngram
+        minGram: 2
+        maxGram: 3
+      - type: token-ngram
+        source: english
+        minGram: 1
+        maxGram: 2
+    DecimalType:
+      type: object
+      description: Decimal column type.
+      example:
+        type: Decimal
       required:
       - type
       properties:
@@ -281,7 +268,7 @@ components:
           description: Type of the column.
           type: string
           enum:
-          - string
+          - decimal
         nullable:
           description: When true, `null` values are allowed.
           type: boolean
@@ -330,42 +317,100 @@ components:
           description: The string used to join the features of the source analyzer.
           type: string
           default: '" "'
-    AliasAnalyzer:
-      type: string
-      examples:
-      - standard
-      - whitespace
-      - english
-      - en
-    FromTablemodify:
-      example: impressions
-      examples:
-      - impressions
-      - products
-      - customers
-      - messages
-      type: string
-    CopyTableOperation:
+    RenameTableOperation:
       type: object
       example:
-        copy: new_table
         from: old_table
+        rename: new_table
       required:
       - from
-      - copy
+      - rename
       properties:
         from:
           example: old_table
           $ref: '#/components/schemas/FromTablemodify'
-          description: The existing table to copy
-        copy:
+          description: The table to rename
+        rename:
           example: new_table
           $ref: '#/components/schemas/FromTablemodify'
-          description: The target name of the new copy
+          description: The name of the renamed table
         replace:
           type: boolean
           description: If replace is true, operation will overwrite any existing table
           default: false
+    LanguageAnalyzer:
+      type: object
+      required:
+      - type
+      - language
+      examples:
+      - type: language
+        language: en
+      - type: language
+        language: english
+        useDefaultStopWords: true
+        customStopWords:
+        - flower
+        customKeyWords:
+        - animal
+      properties:
+        type:
+          description: Type of the analyzer.
+          type: string
+          enum:
+          - language
+        language:
+          description: Name or code of the language.
+          type: string
+        useDefaultStopWords:
+          description: Use the language default stopwords.
+          type: boolean
+          default: false
+        customStopWords:
+          description: List of words that will be filtered.
+          type: array
+          default: []
+          items:
+            type: string
+        customKeyWords:
+          description: List of words that will not be featurizerd.
+          type: array
+          default: []
+          items:
+            type: string
+    StringType:
+      type: object
+      description: '"String column type.
+
+        The string data type is a primitive version of the Text type.
+
+        The value is turned into a single feature. For example `"lazy black cat"` becomes 1
+
+        feature: `"lazy black cat"`."
+
+        '
+      example:
+        type: String
+      examples:
+      - type: String
+      - type: String
+        link: messages.id
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - string
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
     UserDefinedTableSchema:
       type: object
       description: '"Any schema which is a valid Aito table schema.
@@ -405,27 +450,57 @@ components:
           properties:
             <yourColumnName>:
               $ref: '#/components/schemas/ColumnType'
-    DecimalType:
+    FromTablemodify:
+      example: impressions
+      examples:
+      - impressions
+      - products
+      - customers
+      - messages
+      type: string
+    AliasAnalyzer:
+      type: string
+      examples:
+      - standard
+      - whitespace
+      - english
+      - en
+    ArrayType:
       type: object
-      description: Decimal column type.
+      description: '"Array column type.
+
+        Arrays contain ordered lists of primitive values of a single type.
+
+        Supported item types: Int (Int[]), Long (Long[]), Decimal (Decimal[]), Boolean (Boolean[]), String (String[]).
+
+        Arrays are useful for storing multi-valued attributes like tags, categories, or feature vectors."
+
+        '
       example:
-        type: Decimal
+        type: Int[]
+      examples:
+      - type: Int[]
+      - type:
+        - String[]
+        - 'null'
+      - type: Decimal[]
+      - type: Boolean[]
       required:
       - type
       properties:
         type:
-          description: Type of the column.
+          description: Type of the column. Use Type[] syntax for arrays, e.g., Int[], String[].
           type: string
           enum:
-          - decimal
+          - Int[]
+          - Long[]
+          - Decimal[]
+          - String[]
+          - Boolean[]
         nullable:
-          description: When true, `null` values are allowed.
+          description: When true, `null` values are allowed for the entire array.
           type: boolean
           default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
     IntType:
       type: object
       description: '"Integer column type."
@@ -453,32 +528,22 @@ components:
           description: Path to a column of a linked row.
           type: string
           default: 'null'
-    DelimiterAnalyzer:
+    DeleteSchemaResponse:
+      description: '"Deleted tables."
+
+        '
       type: object
       required:
-      - type
-      - delimiter
-      examples:
-      - type: delimiter
-        delimiter: ','
-      - type: delimiter
-        delimiter: '
-
-          '
-        trimWhitespace: true
+      - deleted
+      example:
+        deleted:
+        - products
       properties:
-        type:
-          description: Type of the analyzer.
-          type: string
-          enum:
-          - delimiter
-        delimiter:
-          type: string
-          description: The delimiter
-        trimWhitespace:
-          description: Trims leading and trailing whitespace of the features
-          type: boolean
-          default: true
+        deleted:
+          type: array
+          items:
+            type: string
+          description: Array of table names deleted.
     ColumnType:
       type: object
       description: '"Type of the column.
@@ -526,129 +591,6 @@ components:
           Decimal[]: '#/components/schemas/ArrayType'
           String[]: '#/components/schemas/ArrayType'
           Boolean[]: '#/components/schemas/ArrayType'
-    CharNGramAnalyzer:
-      type: object
-      required:
-      - type
-      - minGram
-      - maxGram
-      example:
-        type: char-ngram
-        minGram: 2
-        maxGram: 3
-      properties:
-        type:
-          description: Type of the analyzer.
-          type: string
-          enum:
-          - char-ngram
-        minGram:
-          description: The minimum length of characters in a feature.
-          type: integer
-          format: int32
-        maxGram:
-          description: The maximum length of characters in a feature.
-          type: integer
-          format: int32
-    JsonType:
-      type: object
-      description: '"Json column type.
-
-        The json data type can be any atomic JSON value, object, array or nested structure.
-
-        The json value is turned into a single feature. For example `{"list":[1, 2], "value":true}` becomes 1
-
-        feature: `{"list":[1, 2], "value":true}`."
-
-        '
-      example:
-        type: Json
-      examples:
-      - type:
-        - Json
-        - 'null'
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - json
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    RenameTableOperation:
-      type: object
-      example:
-        from: old_table
-        rename: new_table
-      required:
-      - from
-      - rename
-      properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The table to rename
-        rename:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The name of the renamed table
-        replace:
-          type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
-    DeleteSchemaResponse:
-      description: '"Deleted tables."
-
-        '
-      type: object
-      required:
-      - deleted
-      example:
-        deleted:
-        - products
-      properties:
-        deleted:
-          type: array
-          items:
-            type: string
-          description: Array of table names deleted.
-    BooleanType:
-      type: object
-      description: '"Boolean column type.
-
-        When column is a boolean, the only accepted values are `true` and `false`."
-
-        '
-      example:
-        type: boolean
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - boolean
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    EmptyDocument:
-      type: object
-      required: null
-      properties: null
     UserDefinedDatabaseSchema:
       type: object
       description: '"Any schema which is a valid Aito database schema.
@@ -691,105 +633,126 @@ components:
           properties:
             <yourTableName>:
               $ref: '#/components/schemas/UserDefinedTableSchema'
-    LanguageAnalyzer:
+    CharNGramAnalyzer:
       type: object
       required:
       - type
-      - language
-      examples:
-      - type: language
-        language: en
-      - type: language
-        language: english
-        useDefaultStopWords: true
-        customStopWords:
-        - flower
-        customKeyWords:
-        - animal
+      - minGram
+      - maxGram
+      example:
+        type: char-ngram
+        minGram: 2
+        maxGram: 3
       properties:
         type:
           description: Type of the analyzer.
           type: string
           enum:
-          - language
-        language:
-          description: Name or code of the language.
-          type: string
-        useDefaultStopWords:
-          description: Use the language default stopwords.
-          type: boolean
-          default: false
-        customStopWords:
-          description: List of words that will be filtered.
-          type: array
-          default: []
-          items:
-            type: string
-        customKeyWords:
-          description: List of words that will not be featurizerd.
-          type: array
-          default: []
-          items:
-            type: string
-    ArrayType:
+          - char-ngram
+        minGram:
+          description: The minimum length of characters in a feature.
+          type: integer
+          format: int32
+        maxGram:
+          description: The maximum length of characters in a feature.
+          type: integer
+          format: int32
+    BooleanType:
       type: object
-      description: '"Array column type.
+      description: '"Boolean column type.
 
-        Arrays contain ordered lists of primitive values of a single type.
-
-        Supported item types: Int (Int[]), Long (Long[]), Decimal (Decimal[]), Boolean (Boolean[]), String (String[]).
-
-        Arrays are useful for storing multi-valued attributes like tags, categories, or feature vectors."
+        When column is a boolean, the only accepted values are `true` and `false`."
 
         '
       example:
-        type: Int[]
-      examples:
-      - type: Int[]
-      - type:
-        - String[]
-        - 'null'
-      - type: Decimal[]
-      - type: Boolean[]
+        type: boolean
       required:
       - type
       properties:
         type:
-          description: Type of the column. Use Type[] syntax for arrays, e.g., Int[], String[].
+          description: Type of the column.
           type: string
           enum:
-          - Int[]
-          - Long[]
-          - Decimal[]
-          - String[]
-          - Boolean[]
+          - boolean
         nullable:
-          description: When true, `null` values are allowed for the entire array.
+          description: When true, `null` values are allowed.
           type: boolean
           default: true
-    Analyzer:
-      oneOf:
-      - $ref: '#/components/schemas/DelimiterAnalyzer'
-      - $ref: '#/components/schemas/CharNGramAnalyzer'
-      - $ref: '#/components/schemas/LanguageAnalyzer'
-      - $ref: '#/components/schemas/TokenNGramAnalyzer'
-      - $ref: '#/components/schemas/AliasAnalyzer'
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    CopyTableOperation:
+      type: object
+      example:
+        copy: new_table
+        from: old_table
+      required:
+      - from
+      - copy
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The existing table to copy
+        copy:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The target name of the new copy
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    TextType:
+      type: object
+      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
+      example:
+        type: Text
+        analyzer: English
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - text
+        analyzer:
+          $ref: '#/components/schemas/Analyzer'
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    DelimiterAnalyzer:
+      type: object
+      required:
+      - type
+      - delimiter
       examples:
-      - standard
-      - whitespace
-      - english
-      - en
       - type: delimiter
         delimiter: ','
-      - type: language
-        language: en
-      - type: char-ngram
-        minGram: 2
-        maxGram: 3
-      - type: token-ngram
-        source: english
-        minGram: 1
-        maxGram: 2
+      - type: delimiter
+        delimiter: '
+
+          '
+        trimWhitespace: true
+      properties:
+        type:
+          description: Type of the analyzer.
+          type: string
+          enum:
+          - delimiter
+        delimiter:
+          type: string
+          description: The delimiter
+        trimWhitespace:
+          description: Trims leading and trailing whitespace of the features
+          type: boolean
+          default: true
     NewColumnType:
       type: object
       allOf:
@@ -804,19 +767,56 @@ components:
             - type: boolean
             - type: 'null'
             - type: string
+    JsonType:
+      type: object
+      description: '"Json column type.
+
+        The json data type can be any atomic JSON value, object, array or nested structure.
+
+        The json value is turned into a single feature. For example `{"list":[1, 2], "value":true}` becomes 1
+
+        feature: `{"list":[1, 2], "value":true}`."
+
+        '
+      example:
+        type: Json
+      examples:
+      - type:
+        - Json
+        - 'null'
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - json
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    EmptyDocument:
+      type: object
+      required: null
+      properties: null
   parameters:
-    Table:
-      name: table
-      in: path
-      required: true
-      description: The name of the table to add data to
-      schema:
-        type: string
     Column:
       name: table
       in: path
       required: true
       description: The name of the column
+      schema:
+        type: string
+    Table:
+      name: table
+      in: path
+      required: true
+      description: The name of the table to add data to
       schema:
         type: string
   securitySchemes:
