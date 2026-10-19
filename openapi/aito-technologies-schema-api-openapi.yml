@@ -1,10 +1,12 @@
 openapi: 3.2.0
 info:
   title: Aito Technologies Schema API
+  description: Schema management for database tables
 security:
 - ApiKeyAuth: []
 tags:
 - name: Schema
+  description: Schema management for database tables
 paths:
   /api/v1/schema:
     get:
@@ -47,7 +49,7 @@ paths:
     delete:
       tags:
       - Schema
-      description: Delete the entire schema and drop the stored data.
+      description: Delete every TABLE (type table, on either engine) and its stored data. v2 collections (type collection) and other entries of the database (such as a mounted repository) are kept — drop a collection with DELETE /api/v2/schema/{name}. If a kept collection links into a table being deleted, the whole delete is refused with a 400 naming the link, and nothing is deleted.
       operationId: deleteApiV1Schema
       responses:
         200:
@@ -231,36 +233,309 @@ paths:
           description: Invalid request body
       summary: Copy table
       x-summary-source: derived
+  /api/v2/schema:
+    get:
+      tags:
+      - Schema
+      description: Return the schema listing all tables and their types (table or collection).
+      operationId: v2-schema-list
+      responses:
+        200:
+          description: The current schema listing
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  schema:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                          - table
+                          - collection
+      summary: V2 schema list
+      x-summary-source: derived
+    put:
+      tags:
+      - Schema
+      description: Initialize the database with a new schema. Supports both table and collection types.
+      operationId: v2-schema-create
+      requestBody:
+        required: true
+        description: The schema definition with table type annotations
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                schema:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/V2TableDefinition'
+      responses:
+        200:
+          description: Status of the schema creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  tables:
+                    type: array
+                    items:
+                      type: string
+      summary: V2 schema create
+      x-summary-source: derived
+  /api/v2/schema/{table}:
+    put:
+      tags:
+      - Schema
+      description: Create a new table with the specified schema. Use type 'collection' for CollectionDb (optimized for high throughput) or 'table' for legacy TableDb.
+      operationId: v2-schema-create-table
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: Table definition with type and column specifications
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2TableDefinition'
+      responses:
+        200:
+          description: Status of the table creation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  table:
+                    type: string
+                  type:
+                    type: string
+        400:
+          description: Invalid request body or table already exists
+      summary: V2 schema create table
+      x-summary-source: derived
+    get:
+      tags:
+      - Schema
+      description: Return the schema definition for a specific table.
+      operationId: v2-schema-get-table
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      responses:
+        200:
+          description: The table schema definition
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2TableDefinition'
+      summary: V2 schema get table
+      x-summary-source: derived
+    delete:
+      tags:
+      - Schema
+      description: Delete the specified table and its data.
+      operationId: v2-schema-delete-table
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      responses:
+        200:
+          description: Status of the table deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  table:
+                    type: string
+      summary: V2 schema delete table
+      x-summary-source: derived
+  /api/v2/schema/_copy:
+    post:
+      tags:
+      - Schema
+      description: Copy a table schema (without data) to a new table name.
+      operationId: v2-schema-copy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - from
+              - copy
+              properties:
+                from:
+                  type: string
+                  description: Source table name
+                copy:
+                  type: string
+                  description: Target table name
+      responses:
+        200:
+          description: Status of the copy operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  from:
+                    type: string
+                  copy:
+                    type: string
+        400:
+          description: Invalid request body
+      summary: V2 schema copy
+      x-summary-source: derived
+  /api/v2/schema/_infer:
+    post:
+      tags:
+      - Schema
+      description: Infer a schema from a JSON array of example rows WITHOUT creating a table (a dry run). Returns the inferred column types.
+      operationId: v2-schema-infer
+      requestBody:
+        required: true
+        description: A JSON array of example objects.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+      responses:
+        200:
+          description: The inferred schema.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2TableDefinition'
+      summary: V2 schema infer
+      x-summary-source: derived
+  /api/v2/schema/{table}/_plan:
+    post:
+      tags:
+      - Schema
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      description: Declarative schema diff (like `terraform plan`). Diffs the table's current schema against the target in the body and classifies each column as add, rebuild, drop, rejected (lossy), or no-op. Changes nothing.
+      operationId: v2-schema-plan
+      requestBody:
+        required: true
+        description: The target V2TableDefinition.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2TableDefinition'
+      responses:
+        200:
+          description: 'The plan: a per-column list of classified actions.'
+          content:
+            application/json:
+              schema:
+                type: object
+      summary: V2 schema plan
+      x-summary-source: derived
+  /api/v2/schema/{table}/_apply:
+    post:
+      tags:
+      - Schema
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      - name: confirm
+        in: query
+        required: false
+        description: Set true to allow data-loss drops.
+        schema:
+          type: boolean
+      description: Declarative schema converge (like `terraform apply`). Runs the plan and executes it in one commit; refuses lossy/rejected changes, and refuses data-loss drops unless confirm=true. Idempotent.
+      operationId: v2-schema-apply
+      requestBody:
+        required: true
+        description: The target V2TableDefinition.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2TableDefinition'
+      responses:
+        200:
+          description: The applied changes.
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: A lossy/rejected change, or a drop without confirm=true.
+      summary: V2 schema apply
+      x-summary-source: derived
+  /api/v2/schema/{table}/{column}:
+    put:
+      tags:
+      - Schema
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      - $ref: '#/components/parameters/Column'
+      description: Add a new column, or alter an existing column's type / analyzer in place (the engine re-indexes; durable across optimize). Incompatible alters (e.g. Int -> String) are rejected. Optional 'value' backfills a new column.
+      operationId: v2-schema-column-put
+      requestBody:
+        required: true
+        description: The column definition (type, plus optional nullable / analyzer / quantity / link / value).
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: The updated table schema.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/V2TableDefinition'
+        400:
+          description: An incompatible alter.
+      summary: V2 schema column put
+      x-summary-source: derived
+  /api/v2/schema/{table}/_refresh:
+    post:
+      tags:
+      - Schema
+      description: Rebuild a table's materialised view from its source. Use after the data a view depends on has changed, to refresh the derived rows.
+      operationId: v2-schema-refresh
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      responses:
+        200:
+          description: Refresh summary
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Invalid request
+      summary: V2 schema refresh
+      x-summary-source: derived
 components:
   schemas:
-    Analyzer:
-      oneOf:
-      - $ref: '#/components/schemas/DelimiterAnalyzer'
-      - $ref: '#/components/schemas/CharNGramAnalyzer'
-      - $ref: '#/components/schemas/LanguageAnalyzer'
-      - $ref: '#/components/schemas/TokenNGramAnalyzer'
-      - $ref: '#/components/schemas/AliasAnalyzer'
-      examples:
-      - standard
-      - whitespace
-      - english
-      - en
-      - type: delimiter
-        delimiter: ','
-      - type: language
-        language: en
-      - type: char-ngram
-        minGram: 2
-        maxGram: 3
-      - type: token-ngram
-        source: english
-        minGram: 1
-        maxGram: 2
-    DecimalType:
+    TextType:
       type: object
-      description: Decimal column type.
+      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
       example:
-        type: Decimal
+        type: Text
+        analyzer: English
       required:
       - type
       properties:
@@ -268,7 +543,9 @@ components:
           description: Type of the column.
           type: string
           enum:
-          - decimal
+          - text
+        analyzer:
+          $ref: '#/components/schemas/Analyzer'
         nullable:
           description: When true, `null` values are allowed.
           type: boolean
@@ -277,140 +554,22 @@ components:
           description: Path to a column of a linked row.
           type: string
           default: 'null'
-    TokenNGramAnalyzer:
-      type: object
-      required:
-      - type
-      - source
-      - minGram
-      - maxGram
-      examples:
-      - type: token-ngram
-        source: english
-        minGram: 1
-        maxGram: 2
-      - type: token-ngram
-        source:
-          type: delimiter
-          delimiter: ','
-        minGram: 1
-        maxGram: 3
-        tokenSeparator: _
-      properties:
-        type:
-          description: Type of the analyzer.
-          type: string
-          enum:
-          - token-ngram
-        source:
-          description: Source analyzer to generate features before being combined into n-grams.
-          $ref: '#/components/schemas/Analyzer'
-        minGram:
-          description: The minimum number of features to be combined.
-          type: integer
-          format: int32
-        maxGram:
-          description: The maximum number of features to be combined.
-          type: integer
-          format: int32
-        tokenSeparator:
-          description: The string used to join the features of the source analyzer.
-          type: string
-          default: '" "'
-    RenameTableOperation:
-      type: object
-      example:
-        from: old_table
-        rename: new_table
-      required:
-      - from
-      - rename
-      properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The table to rename
-        rename:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The name of the renamed table
-        replace:
-          type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
-    LanguageAnalyzer:
-      type: object
-      required:
-      - type
-      - language
-      examples:
-      - type: language
-        language: en
-      - type: language
-        language: english
-        useDefaultStopWords: true
-        customStopWords:
-        - flower
-        customKeyWords:
-        - animal
-      properties:
-        type:
-          description: Type of the analyzer.
-          type: string
-          enum:
-          - language
-        language:
-          description: Name or code of the language.
-          type: string
-        useDefaultStopWords:
-          description: Use the language default stopwords.
-          type: boolean
-          default: false
-        customStopWords:
-          description: List of words that will be filtered.
-          type: array
-          default: []
-          items:
-            type: string
-        customKeyWords:
-          description: List of words that will not be featurizerd.
-          type: array
-          default: []
-          items:
-            type: string
-    StringType:
-      type: object
-      description: '"String column type.
-
-        The string data type is a primitive version of the Text type.
-
-        The value is turned into a single feature. For example `"lazy black cat"` becomes 1
-
-        feature: `"lazy black cat"`."
+    DeleteSchemaResponse:
+      description: '"Deleted tables."
 
         '
-      example:
-        type: String
-      examples:
-      - type: String
-      - type: String
-        link: messages.id
+      type: object
       required:
-      - type
+      - deleted
+      example:
+        deleted:
+        - products
       properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - string
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
+        deleted:
+          type: array
+          items:
+            type: string
+          description: Array of table names deleted.
     UserDefinedTableSchema:
       type: object
       description: '"Any schema which is a valid Aito table schema.
@@ -450,21 +609,29 @@ components:
           properties:
             <yourColumnName>:
               $ref: '#/components/schemas/ColumnType'
-    FromTablemodify:
-      example: impressions
-      examples:
-      - impressions
-      - products
-      - customers
-      - messages
-      type: string
-    AliasAnalyzer:
-      type: string
+    Analyzer:
+      oneOf:
+      - $ref: '#/components/schemas/DelimiterAnalyzer'
+      - $ref: '#/components/schemas/CharNGramAnalyzer'
+      - $ref: '#/components/schemas/LanguageAnalyzer'
+      - $ref: '#/components/schemas/TokenNGramAnalyzer'
+      - $ref: '#/components/schemas/AliasAnalyzer'
       examples:
       - standard
       - whitespace
       - english
       - en
+      - type: delimiter
+        delimiter: ','
+      - type: language
+        language: en
+      - type: char-ngram
+        minGram: 2
+        maxGram: 3
+      - type: token-ngram
+        source: english
+        minGram: 1
+        maxGram: 2
     ArrayType:
       type: object
       description: '"Array column type.
@@ -501,6 +668,249 @@ components:
           description: When true, `null` values are allowed for the entire array.
           type: boolean
           default: true
+    DecimalType:
+      type: object
+      description: Decimal column type.
+      example:
+        type: Decimal
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - decimal
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    VectorType:
+      type: object
+      description: '"Vector column type.
+
+        Stores a fixed-length dense array of numbers (a pre-computed embedding)
+
+        for similarity search with the `$nearest` query operator. Aito does not
+
+        generate embeddings — supply the vector for each row as an array of
+
+        numbers. `cosine` columns are unit-normalised on ingest."
+
+        '
+      example:
+        type: Vector
+        dimensions: 384
+        similarity: cosine
+      examples:
+      - type: Vector
+        dimensions: 384
+        similarity: cosine
+      - type:
+        - Vector
+        - 'null'
+        dimensions: 768
+        similarity: dotProduct
+      required:
+      - type
+      - dimensions
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - vector
+        dimensions:
+          description: The vector length. Every value must have exactly this many components.
+          type: integer
+        similarity:
+          description: 'How vectors are compared: `cosine` (direction) or `dotProduct` (raw inner product).'
+          type: string
+          enum:
+          - cosine
+          - dotProduct
+          default: cosine
+        nullable:
+          description: When true, rows may omit the vector; such rows are skipped by `$nearest`.
+          type: boolean
+          default: true
+    ColumnType:
+      type: object
+      description: '"Type of the column.
+
+
+        Describes an individual field (or column), the type, and information
+
+        to help Aito preprocess your data. For example what language a textual data contains."
+
+        '
+      example:
+        type: Int
+      examples:
+      - type: int
+      - type: string
+      - type: decimal
+      - type: text
+        analyzer: english
+      - type:
+        - json
+        - 'null'
+      - type: Int[]
+      - type:
+        - String[]
+        - 'null'
+      - type: Vector
+        dimensions: 384
+        similarity: cosine
+      oneOf:
+      - $ref: '#/components/schemas/IntType'
+      - $ref: '#/components/schemas/DecimalType'
+      - $ref: '#/components/schemas/TextType'
+      - $ref: '#/components/schemas/StringType'
+      - $ref: '#/components/schemas/BooleanType'
+      - $ref: '#/components/schemas/JsonType'
+      - $ref: '#/components/schemas/ArrayType'
+      - $ref: '#/components/schemas/VectorType'
+      discriminator:
+        propertyName: type
+        mapping:
+          int: '#/components/schemas/IntType'
+          decimal: '#/components/schemas/DecimalType'
+          text: '#/components/schemas/TextType'
+          string: '#/components/schemas/StringType'
+          boolean: '#/components/schemas/BooleanType'
+          json: '#/components/schemas/JsonType'
+          vector: '#/components/schemas/VectorType'
+          Int[]: '#/components/schemas/ArrayType'
+          Long[]: '#/components/schemas/ArrayType'
+          Decimal[]: '#/components/schemas/ArrayType'
+          String[]: '#/components/schemas/ArrayType'
+          Boolean[]: '#/components/schemas/ArrayType'
+    DelimiterAnalyzer:
+      type: object
+      required:
+      - type
+      - delimiter
+      examples:
+      - type: delimiter
+        delimiter: ','
+      - type: delimiter
+        delimiter: '
+
+          '
+        trimWhitespace: true
+      properties:
+        type:
+          description: Type of the analyzer.
+          type: string
+          enum:
+          - delimiter
+        delimiter:
+          type: string
+          description: The delimiter
+        trimWhitespace:
+          description: Trims leading and trailing whitespace of the features
+          type: boolean
+          default: true
+    FromTablemodify:
+      example: impressions
+      examples:
+      - impressions
+      - products
+      - customers
+      - messages
+      type: string
+    RenameTableOperation:
+      type: object
+      example:
+        from: old_table
+        rename: new_table
+      required:
+      - from
+      - rename
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The table to rename
+        rename:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The name of the renamed table
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    CopyTableOperation:
+      type: object
+      example:
+        copy: new_table
+        from: old_table
+      required:
+      - from
+      - copy
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The existing table to copy
+        copy:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The target name of the new copy
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    CharNGramAnalyzer:
+      type: object
+      required:
+      - type
+      - minGram
+      - maxGram
+      example:
+        type: char-ngram
+        minGram: 2
+        maxGram: 3
+      properties:
+        type:
+          description: Type of the analyzer.
+          type: string
+          enum:
+          - char-ngram
+        minGram:
+          description: The minimum length of characters in a feature.
+          type: integer
+          format: int32
+        maxGram:
+          description: The maximum length of characters in a feature.
+          type: integer
+          format: int32
+    AliasAnalyzer:
+      type: string
+      examples:
+      - standard
+      - whitespace
+      - english
+      - en
+    NewColumnType:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ColumnType'
+      - type: object
+        properties:
+          value:
+            description: Value that existing rows get. Optional if the column is nullable or the table is empty.
+            oneOf:
+            - type: integer
+            - type: number
+            - type: boolean
+            - type: 'null'
+            - type: string
     IntType:
       type: object
       description: '"Integer column type."
@@ -528,69 +938,96 @@ components:
           description: Path to a column of a linked row.
           type: string
           default: 'null'
-    DeleteSchemaResponse:
-      description: '"Deleted tables."
-
-        '
+    V2TableDefinition:
       type: object
-      required:
-      - deleted
-      example:
-        deleted:
-        - products
       properties:
-        deleted:
-          type: array
-          items:
-            type: string
-          description: Array of table names deleted.
-    ColumnType:
+        type:
+          type: string
+          description: 'Table type: ''collection'' for CollectionDb (optimized) or ''table'' for legacy TableDb'
+          enum:
+          - table
+          - collection
+          default: table
+        columns:
+          type: object
+          additionalProperties:
+            type: object
+            required:
+            - type
+            properties:
+              type:
+                type: string
+                description: 'Column data type. Scalars: String, Int, Long, Decimal, Boolean, Text (needs an analyzer), Json, Date. Append [] for an array of that type (e.g. String[], Int[]). Date is stored ISO-8601 (YYYY-MM-DD) and queryable by component ($year, $month, $weekday, ...).
+
+                  '
+                enum:
+                - String
+                - Int
+                - Long
+                - Decimal
+                - Boolean
+                - Text
+                - Json
+                - Date
+                - String[]
+                - Int[]
+                - Long[]
+                - Decimal[]
+                - Boolean[]
+                - Text[]
+                - Json[]
+                - Date[]
+              nullable:
+                type: boolean
+                description: Whether the column allows null values (a real defined-mask for scalar columns, not a sentinel).
+              quantity:
+                type: boolean
+                description: 'For numeric columns (Int / Long / Decimal): mark the column a quantity (nearby values share evidence — binned) vs an identifier (each value stands alone). Default: Decimal = true, Int / Long = false.
+
+                  '
+              link:
+                type: string
+                description: Link to another table in format 'tableName.columnName'. Paths traverse multiple hops in queries.
+              analyzer:
+                type: string
+                description: Text analyzer to use (e.g., 'standard')
+    StringType:
       type: object
-      description: '"Type of the column.
+      description: '"String column type.
 
+        The string data type is a primitive version of the Text type.
 
-        Describes an individual field (or column), the type, and information
+        The value is turned into a single feature. For example `"lazy black cat"` becomes 1
 
-        to help Aito preprocess your data. For example what language a textual data contains."
+        feature: `"lazy black cat"`."
 
         '
       example:
-        type: Int
+        type: String
       examples:
-      - type: int
-      - type: string
-      - type: decimal
-      - type: text
-        analyzer: english
-      - type:
-        - json
-        - 'null'
-      - type: Int[]
-      - type:
-        - String[]
-        - 'null'
-      oneOf:
-      - $ref: '#/components/schemas/IntType'
-      - $ref: '#/components/schemas/DecimalType'
-      - $ref: '#/components/schemas/TextType'
-      - $ref: '#/components/schemas/StringType'
-      - $ref: '#/components/schemas/BooleanType'
-      - $ref: '#/components/schemas/JsonType'
-      - $ref: '#/components/schemas/ArrayType'
-      discriminator:
-        propertyName: type
-        mapping:
-          int: '#/components/schemas/IntType'
-          decimal: '#/components/schemas/DecimalType'
-          text: '#/components/schemas/TextType'
-          string: '#/components/schemas/StringType'
-          boolean: '#/components/schemas/BooleanType'
-          json: '#/components/schemas/JsonType'
-          Int[]: '#/components/schemas/ArrayType'
-          Long[]: '#/components/schemas/ArrayType'
-          Decimal[]: '#/components/schemas/ArrayType'
-          String[]: '#/components/schemas/ArrayType'
-          Boolean[]: '#/components/schemas/ArrayType'
+      - type: String
+      - type: String
+        link: messages.id
+      required:
+      - type
+      properties:
+        type:
+          description: Type of the column.
+          type: string
+          enum:
+          - string
+        nullable:
+          description: When true, `null` values are allowed.
+          type: boolean
+          default: true
+        link:
+          description: Path to a column of a linked row.
+          type: string
+          default: 'null'
+    EmptyDocument:
+      type: object
+      required: null
+      properties: null
     UserDefinedDatabaseSchema:
       type: object
       description: '"Any schema which is a valid Aito database schema.
@@ -633,30 +1070,46 @@ components:
           properties:
             <yourTableName>:
               $ref: '#/components/schemas/UserDefinedTableSchema'
-    CharNGramAnalyzer:
+    TokenNGramAnalyzer:
       type: object
       required:
       - type
+      - source
       - minGram
       - maxGram
-      example:
-        type: char-ngram
-        minGram: 2
+      examples:
+      - type: token-ngram
+        source: english
+        minGram: 1
+        maxGram: 2
+      - type: token-ngram
+        source:
+          type: delimiter
+          delimiter: ','
+        minGram: 1
         maxGram: 3
+        tokenSeparator: _
       properties:
         type:
           description: Type of the analyzer.
           type: string
           enum:
-          - char-ngram
+          - token-ngram
+        source:
+          description: Source analyzer to generate features before being combined into n-grams.
+          $ref: '#/components/schemas/Analyzer'
         minGram:
-          description: The minimum length of characters in a feature.
+          description: The minimum number of features to be combined.
           type: integer
           format: int32
         maxGram:
-          description: The maximum length of characters in a feature.
+          description: The maximum number of features to be combined.
           type: integer
           format: int32
+        tokenSeparator:
+          description: The string used to join the features of the source analyzer.
+          type: string
+          default: '" "'
     BooleanType:
       type: object
       description: '"Boolean column type.
@@ -682,91 +1135,46 @@ components:
           description: Path to a column of a linked row.
           type: string
           default: 'null'
-    CopyTableOperation:
-      type: object
-      example:
-        copy: new_table
-        from: old_table
-      required:
-      - from
-      - copy
-      properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The existing table to copy
-        copy:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The target name of the new copy
-        replace:
-          type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
-    TextType:
-      type: object
-      description: "\"Text column type.\n\nThe text data type allows smarter textual analysis. Aito extracts features of the given text\ncontents with the configurable `analyzer`.\n\nSupported analyzers:\n* `\"Whitespace\"` Extracts features by white space splitting.\n    *\"lazy black cat\"* would be turned into 3 features: *\"lazy\"*, *\"black\"*, *\"cat\"*.\n* `\"English\"` Extracts features by English stemming.\n    *\"aito database\"* would be turned into 2 features: *\"aito\"*, *\"databas\"*.\n* `\"Finnish\"`\n* `\"Swedish\"`\n* `\"German\"`\"\n"
-      example:
-        type: Text
-        analyzer: English
-      required:
-      - type
-      properties:
-        type:
-          description: Type of the column.
-          type: string
-          enum:
-          - text
-        analyzer:
-          $ref: '#/components/schemas/Analyzer'
-        nullable:
-          description: When true, `null` values are allowed.
-          type: boolean
-          default: true
-        link:
-          description: Path to a column of a linked row.
-          type: string
-          default: 'null'
-    DelimiterAnalyzer:
+    LanguageAnalyzer:
       type: object
       required:
       - type
-      - delimiter
+      - language
       examples:
-      - type: delimiter
-        delimiter: ','
-      - type: delimiter
-        delimiter: '
-
-          '
-        trimWhitespace: true
+      - type: language
+        language: en
+      - type: language
+        language: english
+        useDefaultStopWords: true
+        customStopWords:
+        - flower
+        customKeyWords:
+        - animal
       properties:
         type:
           description: Type of the analyzer.
           type: string
           enum:
-          - delimiter
-        delimiter:
+          - language
+        language:
+          description: Name or code of the language.
           type: string
-          description: The delimiter
-        trimWhitespace:
-          description: Trims leading and trailing whitespace of the features
+        useDefaultStopWords:
+          description: Use the language default stopwords.
           type: boolean
-          default: true
-    NewColumnType:
-      type: object
-      allOf:
-      - $ref: '#/components/schemas/ColumnType'
-      - type: object
-        properties:
-          value:
-            description: Value that existing rows get. Optional if the column is nullable or the table is empty.
-            oneOf:
-            - type: integer
-            - type: number
-            - type: boolean
-            - type: 'null'
-            - type: string
+          default: false
+        customStopWords:
+          description: List of words that will be filtered.
+          type: array
+          default: []
+          items:
+            type: string
+        customKeyWords:
+          description: List of words that will not be featurizerd.
+          type: array
+          default: []
+          items:
+            type: string
     JsonType:
       type: object
       description: '"Json column type.
@@ -800,10 +1208,6 @@ components:
           description: Path to a column of a linked row.
           type: string
           default: 'null'
-    EmptyDocument:
-      type: object
-      required: null
-      properties: null
   parameters:
     Column:
       name: table

@@ -1,0 +1,132 @@
+openapi: 3.2.0
+info:
+  title: Aito Technologies Envs API
+security:
+- ApiKeyAuth: []
+tags:
+- name: envs
+paths:
+  /api/v2/_envs:
+    get:
+      tags:
+      - envs
+      description: List all environments. An environment is a named copy-on-write view of the database (branch, write independently, atomically promote), shared across API versions. A read API key is required. An environment is selected purely by URL path (see the branch endpoint); it is never chosen by a request body field, query parameter, or header.
+      operationId: v2-envs-list
+      responses:
+        200:
+          description: The list of environments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  envs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+      summary: V2 envs list
+      x-summary-source: derived
+    post:
+      tags:
+      - envs
+      description: 'Branch a new environment from an existing one (copy-on-write, no data copy). A read-write API key is required. Once branched, address the env by URL path — prefix any request with /env/{name}/ (e.g. /env/v2-demo/api/v2/_query), or /db/{db}/env/{name}/ on a multi-tenant server. There is no env-scoped API key: the same key that reads or writes master reads or writes every env.'
+      operationId: v2-envs-create
+      requestBody:
+        required: true
+        description: The new environment name and the env to branch from.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: The name of the new environment
+                basedOn:
+                  type: string
+                  description: 'The environment to branch from (default: env.master)'
+      responses:
+        200:
+          description: The created environment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  basedOn:
+                    type: string
+        400:
+          description: Invalid request body
+      summary: V2 envs create
+      x-summary-source: derived
+  /api/v2/_envs/{name}:
+    delete:
+      tags:
+      - envs
+      description: Delete an environment. The master environment cannot be deleted. A read-write API key is required.
+      operationId: v2-envs-delete
+      parameters:
+      - name: name
+        in: path
+        required: true
+        description: The environment name
+        schema:
+          type: string
+      responses:
+        200:
+          description: Status of the deletion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  name:
+                    type: string
+        400:
+          description: Cannot delete the master environment
+      summary: V2 envs delete
+      x-summary-source: derived
+  /api/v2/_envs/{name}/promote:
+    post:
+      tags:
+      - envs
+      description: Atomically swap an environment into master. The source env is not deleted and diverges from master on subsequent writes. A read-write API key is required.
+      operationId: v2-envs-promote
+      parameters:
+      - name: name
+        in: path
+        required: true
+        description: The environment name
+        schema:
+          type: string
+      responses:
+        200:
+          description: Status of the promote
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  name:
+                    type: string
+        400:
+          description: Cannot promote master onto itself
+      summary: V2 envs promote
+      x-summary-source: derived
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

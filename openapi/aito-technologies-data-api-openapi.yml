@@ -1,10 +1,12 @@
 openapi: 3.2.0
 info:
   title: Aito Technologies Data API
+  description: Data management endpoints for inserting, deleting, and optimizing
 security:
 - ApiKeyAuth: []
 tags:
 - name: Data
+  description: Data management endpoints for inserting, deleting, and optimizing
 paths:
   /api/v1/data/{table}:
     post:
@@ -196,137 +198,444 @@ paths:
           description: Invalid request body
       summary: Modify
       x-summary-source: derived
+  /api/v2/data/{table}:
+    post:
+      tags:
+      - Data
+      description: Insert a single data entry into the specified table. Supports both TableDb and CollectionDb tables.
+      operationId: v2-data-insert
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: Any object valid according to the table schema
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDefinedObjectInternalWrapper'
+      responses:
+        200:
+          description: Status of the insert operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  entries:
+                    type: integer
+        400:
+          description: Invalid request body
+      summary: V2 data insert
+      x-summary-source: derived
+  /api/v2/data/{table}/batch:
+    post:
+      tags:
+      - Data
+      description: Insert a batch of data entries into the specified table. The batch is a JSON array of valid entries according to the table schema. Supports both TableDb and CollectionDb tables.
+      operationId: v2-data-batch
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: An array of objects valid according to the table schema
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserDefinedObject'
+      responses:
+        200:
+          description: Summary of the insert operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  entries:
+                    type: integer
+        400:
+          description: Invalid request body
+      summary: V2 data batch
+      x-summary-source: derived
+  /api/v2/data/{table}/stream:
+    post:
+      tags:
+      - Data
+      description: Insert data entries using newline-delimited JSON (NDJSON) format. Each line is a separate JSON object. Supports both TableDb and CollectionDb tables.
+      operationId: v2-data-stream
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: Newline-delimited JSON objects
+        content:
+          application/json:
+            schema:
+              type: string
+              description: NDJSON format - one JSON object per line
+      responses:
+        200:
+          description: Summary of the insert operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  entries:
+                    type: integer
+        400:
+          description: Invalid request body
+      summary: V2 data stream
+      x-summary-source: derived
+  /api/v2/data/{table}/_cluster:
+    post:
+      tags:
+      - Data
+      description: Fit a k-means codebook over a dense vector/embedding column and store each row's cluster id as a derived column — WITHOUT changing the declared schema. Turns embeddings into a categorical the query engine can use as evidence.
+      operationId: v2-data-cluster
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: 'Cluster spec: the source vector column, the codebook size, and an optional output-column name.'
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - column
+              properties:
+                column:
+                  type: string
+                  description: The dense vector/embedding column to cluster.
+                k:
+                  type: integer
+                  description: Number of clusters (codebook size). Default 64.
+                as:
+                  type: string
+                  description: Name of the derived cluster-id column. Default <column>_cluster.
+      responses:
+        200:
+          description: Cluster summary
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Invalid request
+      summary: V2 data cluster
+      x-summary-source: derived
+  /api/v2/data/{table}/optimize:
+    post:
+      tags:
+      - Data
+      summary: Optimize the table by merging segments for better read performance
+      operationId: v2-data-optimize
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: An empty object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizeOperation'
+      responses:
+        200:
+          description: An empty object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizeOperationResponse'
+        400:
+          description: Invalid request body
+  /api/v2/data/{table}/repair:
+    post:
+      tags:
+      - Data
+      summary: Rebuild the table's binary from its seed (recovery).
+      operationId: v2-data-repair
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        description: An empty object
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        200:
+          description: An empty object
+          content:
+            application/json:
+              schema:
+                type: object
+        400:
+          description: Invalid request body
+  /api/v2/data/_delete:
+    post:
+      tags:
+      - Data
+      description: Delete the rows matching a where clause — exactly the rows a _query with the same where returns. Supports both TableDb and CollectionDb tables. The where is a field value (equality), a field condition with $eq, $ne, $lt, $lte, $gt, $gte, $in or $not, and $and / $or / $not around those. A negation selects the rows that HAVE a value other than the negated one (a row with the field unset is not deleted). An unknown operator or column is a 400, never a silent zero-row delete; an empty where is refused (drop the table instead).
+      operationId: v2-data-delete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - from
+              properties:
+                from:
+                  type: string
+                  description: Table name
+                where:
+                  type: object
+                  description: Query conditions for matching entries to delete
+      responses:
+        200:
+          description: Number of deleted entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+        400:
+          description: Invalid request body
+      summary: V2 data delete
+      x-summary-source: derived
+  /api/v2/data/_modify:
+    post:
+      tags:
+      - Data
+      description: 'Atomic table + data operations, applied in one commit. Accepts one operation object, or {operations: [...]} to apply several. ROW OPS: insert ({into, insert}), update ({update, set, where, upsert?}), delete ({from, delete}), backfill ({backfill, key, keys, columns, upsert?} - bulk-set column values on existing rows by key). TABLE OPS: copy ({from, copy, replace?}) grafts a table by reference (zero-copy); `from` may be a nested path (a/b), a subtree wildcard (a/*), or name another ref of this database as "ref:path" (env.NAME or release.NAME) to copy across branches/releases, and `copy` may itself be nested. move ({move, to, replace?}) relocates a top-level table to a new, possibly nested name (creates the sub-env, drops the source). link ({from, link, replace?}) stores a live reference resolved on every read, instead of a snapshot copy. rename ({from, rename}) renames a table. MAINTENANCE: optimize ({optimize}), repair ({repair}) rebuilds a table from its seed to recover a structurally-broken segment, warm ({warm: [queries]}). Requires a read-write API key.'
+      operationId: v2-data-modify
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnyModification'
+      responses:
+        200:
+          description: Modification results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnyModification'
+        400:
+          description: Invalid request body
+      summary: V2 data modify
+      x-summary-source: derived
+  /api/v2/data/{table}/_backfill:
+    post:
+      tags:
+      - Data
+      description: Bulk-set column values on existing rows, matched by a business key — the compact way to populate a column with new values after adding it. The columnar body carries a `key` column name plus index-aligned `keys` and `columns` value arrays, so it stays small for large jobs. Applied in one commit; a key that matches no row is a no-op unless `upsert` is true. Sugar over the `backfill` operation of _modify; works on both TableDb and CollectionDb.
+      operationId: v2-data-backfill
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - key
+              - keys
+              - columns
+              properties:
+                key:
+                  type: string
+                  description: The business-key column used to match existing rows
+                keys:
+                  type: array
+                  description: Key values, one per row to update
+                  items: {}
+                columns:
+                  type: object
+                  description: Column name -> array of new values, each array index-aligned to `keys`
+                  additionalProperties:
+                    type: array
+                    items: {}
+                upsert:
+                  type: boolean
+                  default: false
+                  description: If true, insert a new row for a key that matches nothing
+      responses:
+        200:
+          description: Number of rows updated (plus inserted, when upsert)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+        400:
+          description: Invalid request body (missing key/keys/columns, or arrays not index-aligned)
+      summary: V2 data backfill
+      x-summary-source: derived
+  /api/v2/data/{table}/import:
+    post:
+      tags:
+      - Data
+      description: 'Schema-flexible JSON import: POST an array of objects and Aito infers the column types, creating the table if it doesn''t exist and appending if it does (extending the schema with any new fields — existing rows get null). Use ?type=table to create a legacy rep1 table instead of a collection.'
+      operationId: v2-data-import
+      parameters:
+      - $ref: '#/components/parameters/Table'
+      - name: type
+        in: query
+        required: false
+        description: collection (default) or table.
+        schema:
+          type: string
+          enum:
+          - collection
+          - table
+      requestBody:
+        required: true
+        description: A JSON array of objects to import.
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+      responses:
+        200:
+          description: Import status, count, and the (inferred) schema.
+        400:
+          description: Invalid request body
+      summary: V2 data import
+      x-summary-source: derived
 components:
   schemas:
-    Numeric:
+    UserDefinedObject:
       example:
-        $numeric: 42
-      examples:
-      - $numeric: 42
-      - $numeric: 3.14
+        name: My product
+        price: 172.19
       type: object
-      properties:
-        $numeric:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-    PrimitiveProposition:
-      example: 4
-      examples:
-      - 4
-      - 3.1
-      - false
-      - null
-      - text
-      oneOf:
-      - $ref: '#/components/schemas/GetValueExpression'
-      - type: integer
-        format: int32
-      - type: integer
-        format: int64
-      - type: number
-      - type: 'null'
-      - $ref: '#/components/schemas/ArrayValue'
-      - $ref: '#/components/schemas/ToString'
-      - type: boolean
-      - type: string
-      - $ref: '#/components/schemas/Json'
-    Exists:
+    Patterns:
       example:
-        $exists:
-        - query
-        - product.tags
-      examples:
-      - $exists:
-        - query
-        - product.tags
-      - from: impressions
+        from: invoices
         where:
-          $on:
-          - $exists:
-            - query
-            - customer.tags
-          - click: true
+          GLCode: R001
         relate:
-        - product.title
-        - product.tags
-      type: object
-      properties:
-        $exists:
-          $ref: '#/components/schemas/PropositionSet'
-    StartsWith:
-      example:
-        $startsWith: Cucumber
+          $patterns:
+          - Description
+          - Processor
+          - Acceptor
       examples:
-      - $startsWith: Cucumber
-      - from: products
+      - from: invoices
         where:
-          name:
-            $startsWith: Cucumber
+          GLCode: R001
+        relate:
+          $patterns:
+          - Description
+          - Processor
+          - Acceptor
+      - from: visits
+        where:
+          weekday: Saturday
+        relate:
+          $patterns:
+            $related:
+              relate:
+              - purchases
+              k: 16
+              to:
+                weekday: Saturday
+              by: lift
       type: object
       properties:
-        $startsWith:
-          oneOf:
-          - $ref: '#/components/schemas/ToString'
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: string
-    PropositionSet:
-      example: product.tags
-      examples:
-      - product.tags
-      - query
-      - product
-      - tags
-      oneOf:
-      - type: array
-        items:
+        $patterns:
           $ref: '#/components/schemas/PropositionSet'
-      - type: string
-      - $ref: '#/components/schemas/Proposition'
-    Nn:
-      example:
-        $nn:
-        - tags: laptop
-      examples:
-      - $nn:
-        - tags: laptop
-      - $nn:
-          near:
-            tags: laptop
+    FileUploadProcessTriggerResponse:
+      description: Processing started status.
       type: object
+      required:
+      - id
+      - status
       properties:
-        $nn:
+        id:
+          type: string
+          description: The id of the operation. Should match the one in the url parameter.
+        status:
+          type: string
+          enum:
+          - started
+          - inprogress
+          - finished
+          description: Textual description of the job.
+    DeleteOperationResponse:
+      type: object
+      required:
+      - total
+      properties:
+        total:
+          description: 'The number of rows that was deleted
+
+            '
+          type: integer
+          format: int64
+    FieldProposition:
+      type: object
+      required:
+      - fieldName
+      properties:
+        fieldName:
           oneOf:
-          - $ref: '#/components/schemas/NnPropositionObject'
-          - $ref: '#/components/schemas/NnPropositionArray'
-    Or:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    NnPropositionArray:
       example:
-        $or:
-        - tags: cover
-        - tags: laptop
+      - tags: laptop
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        oneOf:
+        - oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+        - type: number
+    Mod:
+      example:
+        $mod:
+        - 2
+        - 0
       examples:
-      - $or:
-        - tags: cover
-        - tags: laptop
+      - $mod:
+        - 2
+        - 0
+      - $mod:
+          divisor: 2
+          remainder: 0
       - from: products
         where:
           price:
-            $or:
-            - $lt: 0.9
-            - $gt: 2.1
+            $mod:
+              divisor: 2
+              remainder: 0
       type: object
       properties:
-        $or:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/Proposition'
-            - $ref: '#/components/schemas/PrimitiveProposition'
+        $mod:
+          oneOf:
+          - $ref: '#/components/schemas/ModPropositionObject'
+          - $ref: '#/components/schemas/ModPropositionArray'
     ToString:
       example:
         $toString: 4
@@ -346,216 +655,22 @@ components:
           - type: boolean
           - type: string
           - $ref: '#/components/schemas/Json'
-    KnnPropositionObject:
+    NnPropositionObject:
       type: object
       example:
-        k: 4
         near:
           tags: laptop
       required:
-      - k
       - near
       properties:
-        k:
-          example: 4
-          type: integer
-          format: int32
         near:
           example:
             tags: laptop
           oneOf:
           - $ref: '#/components/schemas/Proposition'
           - $ref: '#/components/schemas/PrimitiveProposition'
-    DeleteOperationResponse:
-      type: object
-      required:
-      - total
-      properties:
-        total:
-          description: 'The number of rows that was deleted
-
-            '
-          type: integer
-          format: int64
-    UpdateOperation:
-      type: object
-      example:
-        set:
-          archived: true
-        update: users
-        where:
-          status: inactive
-      required:
-      - update
-      - set
-      - where
-      properties:
-        update:
-          example: users
-          type: string
-          description: Table to update
-        set:
-          example:
-            archived: true
-          type: object
-          description: Fields to update with new values (JSON object mapping field names to new values)
-        where:
-          example:
-            status: inactive
-          $ref: '#/components/schemas/Proposition'
-          description: Conditions to match rows for update
-        upsert:
-          type: boolean
-          description: If true, insert if no match found (upsert)
-          default: false
-    Defined:
-      example:
-        $defined: true
-      type: object
-      properties:
-        $defined:
-          type: boolean
-    Has:
-      example:
-        $has: drink
-      examples:
-      - $has: drink
-      - from: products
-        where:
-          tags:
-            $has: drink
-      type: object
-      properties:
-        $has:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    OptimizeOperationResponse:
-      type: object
-      example: {}
-      properties: null
-    AnyModification:
-      oneOf:
-      - $ref: '#/components/schemas/InsertOperation'
-      - $ref: '#/components/schemas/UpdateOperation'
-      - $ref: '#/components/schemas/DeleteOperation2'
-      - $ref: '#/components/schemas/OptimizeOperation2'
-      - $ref: '#/components/schemas/RenameTableOperation'
-      - $ref: '#/components/schemas/CopyTableOperation'
-      - $ref: '#/components/schemas/OperationsWrapper'
-    RenameTableOperation:
-      type: object
-      example:
-        from: old_table
-        rename: new_table
-      required:
-      - from
-      - rename
-      properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The table to rename
-        rename:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The name of the renamed table
-        replace:
-          type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
-    OnPropositionObject:
-      type: object
-      example:
-        'on':
-          user.tags: nyc
-        prop:
-          click: true
-      required:
-      - prop
-      - 'on'
-      properties:
-        prop:
-          example:
-            click: true
-          $ref: '#/components/schemas/Proposition'
-        'on':
-          example:
-            user.tags: nyc
-          $ref: '#/components/schemas/Proposition'
-    Json:
-      type: object
-      properties:
-        $json:
-          type: object
-    Lt:
-      example:
-        $lt: 4
-      examples:
-      - $lt: 4
-      - $lt: -12.1
-      - $lt: '20180502'
-      - from: products
-        where:
-          price:
-            $lt: 1.24
-      type: object
-      properties:
-        $lt:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    And:
-      example:
-        $and:
-        - $gt: 10
-        - $lt: 20
-      examples:
-      - $and:
-        - $gt: 10
-        - $lt: 20
-      - from: products
-        where:
-          price:
-            $and:
-            - $gt: 1.5
-            - $lt: 2.1
-      type: object
-      properties:
-        $and:
-          type: array
-          items:
-            oneOf:
-            - $ref: '#/components/schemas/Proposition'
-            - $ref: '#/components/schemas/PrimitiveProposition'
-    FromTablemodify:
-      example: impressions
-      examples:
-      - impressions
-      - products
-      - customers
-      - messages
-      type: string
+        threshold:
+          type: number
     DeleteOperation:
       type: object
       example:
@@ -575,45 +690,83 @@ components:
             id: 4
           $ref: '#/components/schemas/Proposition'
           description: The entries to delete
-    OperationsWrapper:
+    SamplePropositionObject:
       type: object
       example:
-        operations:
-        - set:
-            stock: 95
-          update: inventory
-          where:
-            product_id: 5
-        - insert:
-            product_id: 5
-            quantity: 5
-          into: orders
-        - insert:
-            amount: 100
-            type: purchase
-          into: transactions
+        n: 100
+        seed: 0
       required:
-      - operations
+      - n
       properties:
-        operations:
-          example:
-          - set:
-              stock: 95
-            update: inventory
-            where:
-              product_id: 5
-          - insert:
-              product_id: 5
-              quantity: 5
-            into: orders
-          - insert:
-              amount: 100
-              type: purchase
-            into: transactions
-          type: array
-          items:
-            $ref: '#/components/schemas/AnyModification'
-          description: List of modification operations to execute atomically
+        n:
+          example: 100
+          type: integer
+          format: int64
+        of:
+          $ref: '#/components/schemas/Proposition'
+        seed:
+          example: 0
+          type: integer
+          format: int64
+    Proposition:
+      example:
+        customer: 4
+        query:
+          $match: laptop
+      examples:
+      - customer: 4
+        query:
+          $match: laptop
+      - price:
+          $gte: 50
+          $lt: 100
+      - tags:
+          $match: laptop
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/Is'
+      - $ref: '#/components/schemas/And'
+      - $ref: '#/components/schemas/Atomic'
+      - $ref: '#/components/schemas/Exact'
+      - $ref: '#/components/schemas/Or'
+      - $ref: '#/components/schemas/Not'
+      - $ref: '#/components/schemas/Defined'
+      - $ref: '#/components/schemas/Has'
+      - $ref: '#/components/schemas/Exists'
+      - $ref: '#/components/schemas/Patterns'
+      - $ref: '#/components/schemas/Related'
+      - $ref: '#/components/schemas/Match'
+      - $ref: '#/components/schemas/StartsWith'
+      - $ref: '#/components/schemas/On'
+      - $ref: '#/components/schemas/Hash'
+      - $ref: '#/components/schemas/Mod'
+      - $ref: '#/components/schemas/Sample'
+      - $ref: '#/components/schemas/Gt'
+      - $ref: '#/components/schemas/Gte'
+      - $ref: '#/components/schemas/Lt'
+      - $ref: '#/components/schemas/Lte'
+      - $ref: '#/components/schemas/Context'
+      - $ref: '#/components/schemas/Knn'
+      - $ref: '#/components/schemas/Nn'
+      - $ref: '#/components/schemas/Numeric'
+      - oneOf:
+        - $ref: '#/components/schemas/ToString'
+        - $ref: '#/components/schemas/GetValueExpression'
+      - $ref: '#/components/schemas/FieldProposition'
+    KnnPropositionArray:
+      example:
+      - 4
+      - tags: laptop
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        oneOf:
+        - type: integer
+          format: int32
+        - oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
     Atomic:
       example:
         $atomic:
@@ -635,123 +788,53 @@ components:
       properties:
         $atomic:
           $ref: '#/components/schemas/Proposition'
-    'On':
-      example:
-        $on:
-          prop:
-            click: true
-          'on':
-            user.tags: nyc
+    PrimitiveProposition:
+      example: 4
       examples:
-      - $on:
-          prop:
-            click: true
-          'on':
-            user.tags: nyc
-      - $on:
-        - click: true
-        - user.tags: nyc
-      type: object
-      properties:
-        $on:
-          oneOf:
-          - $ref: '#/components/schemas/OnPropositionObject'
-          - $ref: '#/components/schemas/OnPropositionArray'
-    UserDefinedObject:
-      example:
-        name: My product
-        price: 172.19
-      type: object
-    DeleteOperation2:
-      type: object
-      example:
-        delete:
-          id: 4
-        from: users
-      required:
-      - from
-      - delete
-      properties:
-        from:
-          example: users
-          type: string
-          description: Table to delete from
-        delete:
-          example:
-            id: 4
-          $ref: '#/components/schemas/Proposition'
-          description: Conditions to match rows for deletion
-    KnnPropositionArray:
-      example:
       - 4
-      - tags: laptop
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        oneOf:
-        - type: integer
-          format: int32
-        - oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    NnPropositionArray:
+      - 3.1
+      - false
+      - null
+      - text
+      oneOf:
+      - $ref: '#/components/schemas/GetValueExpression'
+      - type: integer
+        format: int32
+      - type: integer
+        format: int64
+      - type: number
+      - type: 'null'
+      - $ref: '#/components/schemas/ArrayValue'
+      - $ref: '#/components/schemas/ToString'
+      - type: boolean
+      - type: string
+      - $ref: '#/components/schemas/Json'
+    Related:
       example:
-      - tags: laptop
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        oneOf:
-        - oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-        - type: number
-    ModPropositionObject:
-      type: object
-      example:
-        divisor: 2
-        remainder: 0
-      required:
-      - divisor
-      - remainder
-      properties:
-        divisor:
-          example: 2
-          type: integer
-          format: int64
-        remainder:
-          example: 0
-          type: integer
-          format: int64
-    Knn:
-      example:
-        $knn:
-        - 4
-        - tags: laptop
-      examples:
-      - $knn:
-        - 4
-        - tags: laptop
-      - $knn:
-          k: 4
-          near:
-            tags: laptop
+        from: invoices
+        where:
+          GLCode: R001
+        relate:
+          $patterns:
+            $related:
+              relate:
+              - Description
+              - ProductName
+              k: 16
+              to:
+                GLCode: R001
       type: object
       properties:
-        $knn:
-          oneOf:
-          - $ref: '#/components/schemas/KnnPropositionObject'
-          - $ref: '#/components/schemas/KnnPropositionArray'
-    OnPropositionArray:
-      example:
-      - click: true
-      - user.tags: nyc
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        $ref: '#/components/schemas/Proposition'
+        $related:
+          $ref: '#/components/schemas/RelatedPropositionObject'
+    OptimizeOperationResponse:
+      type: object
+      example: {}
+      properties: null
+    OptimizeOperation:
+      type: object
+      example: {}
+      properties: null
     FileUploadStartResponse:
       description: '"To be clarified."
 
@@ -777,313 +860,28 @@ components:
           type: string
           format: date-time
           description: Defines when the presigned upload link expires
-    CopyTableOperation:
+    OptimizeOperation2:
       type: object
       example:
-        copy: new_table
-        from: old_table
+        optimize: users
       required:
-      - from
-      - copy
+      - optimize
       properties:
-        from:
-          example: old_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The existing table to copy
-        copy:
-          example: new_table
-          $ref: '#/components/schemas/FromTablemodify'
-          description: The target name of the new copy
-        replace:
-          type: boolean
-          description: If replace is true, operation will overwrite any existing table
-          default: false
-    Context:
-      example:
-        $context:
-          click: true
-      examples:
-      - $context:
-          click: true
-      - from: impressions
-        where:
-          customerEmail: john.doe@aito.ai
-          query: laptop
-        get: product
-        orderBy:
-          $p:
-            $context:
-              click: true
-      type: object
-      properties:
-        $context:
-          $ref: '#/components/schemas/Proposition'
-    FileUploadProcessTriggerResponse:
-      description: Processing started status.
-      type: object
-      required:
-      - id
-      - status
-      properties:
-        id:
-          type: string
-          description: The id of the operation. Should match the one in the url parameter.
-        status:
-          type: string
-          enum:
-          - started
-          - inprogress
-          - finished
-          description: Textual description of the job.
-    InsertOperation:
-      type: object
-      example:
-        insert:
-          age: 30
-          name: Alice
-        into: users
-      required:
-      - into
-      - insert
-      properties:
-        into:
+        optimize:
           example: users
           type: string
-          description: Table to insert into
-        insert:
-          example:
-            age: 30
-            name: Alice
-          type: object
-          description: Documents to insert (single document or array of documents as JSON)
-    NnPropositionObject:
-      type: object
+          description: Table to optimize
+    GetValueExpression:
       example:
-        near:
-          tags: laptop
-      required:
-      - near
-      properties:
-        near:
-          example:
-            tags: laptop
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-        threshold:
-          type: number
-    ModPropositionArray:
-      example:
-      - 2
-      - 0
-      type: array
-      minItems: 2
-      maxItems: 2
-      items:
-        type: integer
-        format: int64
-    Is:
-      example:
-        $is: value
-      type: object
-      properties:
-        $is:
-          $ref: '#/components/schemas/PrimitiveProposition'
-    Lte:
-      example:
-        $lte: 8
+        $get: query
       examples:
-      - $lte: 8
-      - $lte: 0
-      - $lte: '20180502'
-      - from: products
-        where:
-          price:
-            $lte: 1
+      - $get: query
+      - $get: click
+      - $get: product.title
       type: object
       properties:
-        $lte:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    Proposition:
-      example:
-        customer: 4
-        query:
-          $match: laptop
-      examples:
-      - customer: 4
-        query:
-          $match: laptop
-      - price:
-          $gte: 50
-          $lt: 100
-      - tags:
-          $match: laptop
-      type: object
-      oneOf:
-      - $ref: '#/components/schemas/Is'
-      - $ref: '#/components/schemas/And'
-      - $ref: '#/components/schemas/Atomic'
-      - $ref: '#/components/schemas/Or'
-      - $ref: '#/components/schemas/Not'
-      - $ref: '#/components/schemas/Defined'
-      - $ref: '#/components/schemas/Has'
-      - $ref: '#/components/schemas/Exists'
-      - $ref: '#/components/schemas/Match'
-      - $ref: '#/components/schemas/StartsWith'
-      - $ref: '#/components/schemas/On'
-      - $ref: '#/components/schemas/Hash'
-      - $ref: '#/components/schemas/Mod'
-      - $ref: '#/components/schemas/Gt'
-      - $ref: '#/components/schemas/Gte'
-      - $ref: '#/components/schemas/Lt'
-      - $ref: '#/components/schemas/Lte'
-      - $ref: '#/components/schemas/Context'
-      - $ref: '#/components/schemas/Knn'
-      - $ref: '#/components/schemas/Nn'
-      - $ref: '#/components/schemas/Numeric'
-      - oneOf:
-        - $ref: '#/components/schemas/ToString'
-        - $ref: '#/components/schemas/GetValueExpression'
-      - $ref: '#/components/schemas/FieldProposition'
-    Hash:
-      example:
-        $hash:
-          $mod:
-          - 2
-          - 1
-      type: object
-      properties:
-        $hash:
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    ArrayValue:
-      oneOf:
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-      - type: object
-    Match:
-      example:
-        $match: coffee
-      examples:
-      - $match: coffee
-      - from: products
-        where:
-          name:
-            $match: coffee
-      type: object
-      properties:
-        $match:
-          oneOf:
-          - $ref: '#/components/schemas/ToString'
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: string
-    OptimizeOperation:
-      type: object
-      example: {}
-      properties: null
-    UserDefinedObjectInternalWrapper:
-      type: object
-      description: Any object which is valid according to the database schema.
-      oneOf:
-      - $ref: '#/components/schemas/UserDefinedObject'
-    FieldProposition:
-      type: object
-      required:
-      - fieldName
-      properties:
-        fieldName:
-          oneOf:
-          - $ref: '#/components/schemas/Proposition'
-          - $ref: '#/components/schemas/PrimitiveProposition'
-    Gt:
-      example:
-        $gt: 8
-      examples:
-      - $gt: 8
-      - $gt: 231.1
-      - $gt: '20150308'
-      - from: products
-        where:
-          price:
-            $gt: 2.14
-      type: object
-      properties:
-        $gt:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
-    BatchImportResponse:
-      description: '"An array of inserted entries."
-
-        '
-      type: object
-      required:
-      - entries
-      - status
-      properties:
-        entries:
-          type: integer
-          description: How many entries were inserted.
-        status:
+        $get:
           type: string
-          description: Status text
-    Gte:
-      example:
-        $gte: -2
-      examples:
-      - $gte: -2
-      - $gte: 0
-      - $gte: '20180502'
-      - from: products
-        where:
-          price:
-            $gte: 2
-      type: object
-      properties:
-        $gte:
-          oneOf:
-          - $ref: '#/components/schemas/GetValueExpression'
-          - type: integer
-            format: int32
-          - type: integer
-            format: int64
-          - type: number
-          - type: 'null'
-          - $ref: '#/components/schemas/ArrayValue'
-          - $ref: '#/components/schemas/ToString'
-          - type: boolean
-          - type: string
-          - $ref: '#/components/schemas/Json'
     FileUploadProcessStatusResponse:
       description: The file processing status.
       type: object
@@ -1141,30 +939,699 @@ components:
               items:
                 $ref: '#/components/schemas/UserDefinedObject'
               description: Array of failing elements. The number of returned elements is restricted.
-    Mod:
+    OnPropositionObject:
+      type: object
       example:
-        $mod:
-        - 2
-        - 0
+        'on':
+          user.tags: nyc
+        prop:
+          click: true
+      required:
+      - prop
+      - 'on'
+      properties:
+        prop:
+          example:
+            click: true
+          $ref: '#/components/schemas/Proposition'
+        'on':
+          example:
+            user.tags: nyc
+          $ref: '#/components/schemas/Proposition'
+    Or:
+      example:
+        $or:
+        - tags: cover
+        - tags: laptop
       examples:
-      - $mod:
-        - 2
-        - 0
-      - $mod:
-          divisor: 2
-          remainder: 0
+      - $or:
+        - tags: cover
+        - tags: laptop
       - from: products
         where:
           price:
-            $mod:
-              divisor: 2
-              remainder: 0
+            $or:
+            - $lt: 0.9
+            - $gt: 2.1
       type: object
       properties:
-        $mod:
+        $or:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Proposition'
+            - $ref: '#/components/schemas/PrimitiveProposition'
+    Numeric:
+      example:
+        $numeric: 42
+      examples:
+      - $numeric: 42
+      - $numeric: 3.14
+      type: object
+      properties:
+        $numeric:
           oneOf:
-          - $ref: '#/components/schemas/ModPropositionObject'
-          - $ref: '#/components/schemas/ModPropositionArray'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+    OnPropositionArray:
+      example:
+      - click: true
+      - user.tags: nyc
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        $ref: '#/components/schemas/Proposition'
+    FromTablemodify:
+      example: impressions
+      examples:
+      - impressions
+      - products
+      - customers
+      - messages
+      type: string
+    AnyModification:
+      oneOf:
+      - $ref: '#/components/schemas/InsertOperation'
+      - $ref: '#/components/schemas/UpdateOperation'
+      - $ref: '#/components/schemas/BackfillOperation'
+      - $ref: '#/components/schemas/DeleteOperation2'
+      - $ref: '#/components/schemas/OptimizeOperation2'
+      - $ref: '#/components/schemas/RenameTableOperation'
+      - $ref: '#/components/schemas/CopyTableOperation'
+      - $ref: '#/components/schemas/WarmOperation'
+      - $ref: '#/components/schemas/OperationsWrapper'
+    And:
+      example:
+        $and:
+        - $gt: 10
+        - $lt: 20
+      examples:
+      - $and:
+        - $gt: 10
+        - $lt: 20
+      - from: products
+        where:
+          price:
+            $and:
+            - $gt: 1.5
+            - $lt: 2.1
+      type: object
+      properties:
+        $and:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Proposition'
+            - $ref: '#/components/schemas/PrimitiveProposition'
+    RenameTableOperation:
+      type: object
+      example:
+        from: old_table
+        rename: new_table
+      required:
+      - from
+      - rename
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The table to rename
+        rename:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The name of the renamed table
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    Gt:
+      example:
+        $gt: 8
+      examples:
+      - $gt: 8
+      - $gt: 231.1
+      - $gt: '20150308'
+      - from: products
+        where:
+          price:
+            $gt: 2.14
+      type: object
+      properties:
+        $gt:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    SamplePropositionNumber:
+      example: 100
+      type: integer
+      format: int64
+    Match:
+      example:
+        $match: coffee
+      examples:
+      - $match: coffee
+      - from: products
+        where:
+          name:
+            $match: coffee
+      type: object
+      properties:
+        $match:
+          oneOf:
+          - $ref: '#/components/schemas/ToString'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: string
+    CopyTableOperation:
+      type: object
+      example:
+        copy: new_table
+        from: old_table
+      required:
+      - from
+      - copy
+      properties:
+        from:
+          example: old_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The existing table to copy
+        copy:
+          example: new_table
+          $ref: '#/components/schemas/FromTablemodify'
+          description: The target name of the new copy
+        replace:
+          type: boolean
+          description: If replace is true, operation will overwrite any existing table
+          default: false
+    Hash:
+      example:
+        $hash:
+          $mod:
+          - 2
+          - 1
+      type: object
+      properties:
+        $hash:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    Exact:
+      example:
+        $exact: exact phrase
+      examples:
+      - $exact: exact phrase
+      - $exact:
+          $is: exact phrase
+      - from: products
+        where:
+          text:
+            $exact: exact phrase
+      type: object
+      properties:
+        $exact:
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    WarmOperation:
+      type: object
+      example:
+        warm:
+        - from: products
+          predict: category
+      required:
+      - warm
+      properties:
+        warm:
+          example:
+          - from: products
+            predict: category
+          type: object
+          description: Queries to execute for cache warming (results are discarded)
+    RelatedPropositionObject:
+      type: object
+      example:
+        k: 32
+        relate:
+        - Description
+        - ProductName
+        to:
+          GLCode: R001
+      required:
+      - relate
+      - to
+      properties:
+        relate:
+          example:
+          - Description
+          - ProductName
+          $ref: '#/components/schemas/PropositionSet'
+        to:
+          example:
+            GLCode: R001
+          $ref: '#/components/schemas/Proposition'
+        k:
+          example: 32
+          type: integer
+          format: int32
+        by:
+          type: string
+    Json:
+      type: object
+      properties:
+        $json:
+          type: object
+    Is:
+      example:
+        $is: value
+      type: object
+      properties:
+        $is:
+          $ref: '#/components/schemas/PrimitiveProposition'
+    UpdateOperation:
+      type: object
+      example:
+        set:
+          archived: true
+        update: users
+        where:
+          status: inactive
+      required:
+      - update
+      - set
+      - where
+      properties:
+        update:
+          example: users
+          type: string
+          description: Table to update
+        set:
+          example:
+            archived: true
+          type: object
+          description: Fields to update with new values (JSON object mapping field names to new values)
+        where:
+          example:
+            status: inactive
+          $ref: '#/components/schemas/Proposition'
+          description: Conditions to match rows for update
+        upsert:
+          type: boolean
+          description: If true, insert if no match found (upsert)
+          default: false
+    Knn:
+      example:
+        $knn:
+        - 4
+        - tags: laptop
+      examples:
+      - $knn:
+        - 4
+        - tags: laptop
+      - $knn:
+          k: 4
+          near:
+            tags: laptop
+      type: object
+      properties:
+        $knn:
+          oneOf:
+          - $ref: '#/components/schemas/KnnPropositionObject'
+          - $ref: '#/components/schemas/KnnPropositionArray'
+    ModPropositionObject:
+      type: object
+      example:
+        divisor: 2
+        remainder: 0
+      required:
+      - divisor
+      - remainder
+      properties:
+        divisor:
+          example: 2
+          type: integer
+          format: int64
+        remainder:
+          example: 0
+          type: integer
+          format: int64
+    BatchImportResponse:
+      description: '"An array of inserted entries."
+
+        '
+      type: object
+      required:
+      - entries
+      - status
+      properties:
+        entries:
+          type: integer
+          description: How many entries were inserted.
+        status:
+          type: string
+          description: Status text
+    Context:
+      example:
+        $context:
+          click: true
+      examples:
+      - $context:
+          click: true
+      - from: impressions
+        where:
+          customerEmail: john.doe@aito.ai
+          query: laptop
+        get: product
+        orderBy:
+          $p:
+            $context:
+              click: true
+      type: object
+      properties:
+        $context:
+          $ref: '#/components/schemas/Proposition'
+    Defined:
+      example:
+        $defined: true
+      type: object
+      properties:
+        $defined:
+          type: boolean
+    Gte:
+      example:
+        $gte: -2
+      examples:
+      - $gte: -2
+      - $gte: 0
+      - $gte: '20180502'
+      - from: products
+        where:
+          price:
+            $gte: 2
+      type: object
+      properties:
+        $gte:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Exists:
+      example:
+        $exists:
+        - query
+        - product.tags
+      examples:
+      - $exists:
+        - query
+        - product.tags
+      - from: impressions
+        where:
+          $on:
+          - $exists:
+            - query
+            - customer.tags
+          - click: true
+        relate:
+        - product.title
+        - product.tags
+      type: object
+      properties:
+        $exists:
+          $ref: '#/components/schemas/PropositionSet'
+    InsertOperation:
+      type: object
+      example:
+        insert:
+          age: 30
+          name: Alice
+        into: users
+      required:
+      - into
+      - insert
+      properties:
+        into:
+          example: users
+          type: string
+          description: Table to insert into
+        insert:
+          example:
+            age: 30
+            name: Alice
+          type: object
+          description: Documents to insert (single document or array of documents as JSON)
+    'On':
+      example:
+        $on:
+          prop:
+            click: true
+          'on':
+            user.tags: nyc
+      examples:
+      - $on:
+          prop:
+            click: true
+          'on':
+            user.tags: nyc
+      - $on:
+        - click: true
+        - user.tags: nyc
+      type: object
+      properties:
+        $on:
+          oneOf:
+          - $ref: '#/components/schemas/OnPropositionObject'
+          - $ref: '#/components/schemas/OnPropositionArray'
+    OperationsWrapper:
+      type: object
+      example:
+        operations:
+        - set:
+            stock: 95
+          update: inventory
+          where:
+            product_id: 5
+        - insert:
+            product_id: 5
+            quantity: 5
+          into: orders
+        - insert:
+            amount: 100
+            type: purchase
+          into: transactions
+      required:
+      - operations
+      properties:
+        operations:
+          example:
+          - set:
+              stock: 95
+            update: inventory
+            where:
+              product_id: 5
+          - insert:
+              product_id: 5
+              quantity: 5
+            into: orders
+          - insert:
+              amount: 100
+              type: purchase
+            into: transactions
+          type: array
+          items:
+            $ref: '#/components/schemas/AnyModification'
+          description: List of modification operations to execute atomically
+    StartsWith:
+      example:
+        $startsWith: Cucumber
+      examples:
+      - $startsWith: Cucumber
+      - from: products
+        where:
+          name:
+            $startsWith: Cucumber
+      type: object
+      properties:
+        $startsWith:
+          oneOf:
+          - $ref: '#/components/schemas/ToString'
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: string
+    DeleteOperation2:
+      type: object
+      example:
+        delete:
+          id: 4
+        from: users
+      required:
+      - from
+      - delete
+      properties:
+        from:
+          example: users
+          type: string
+          description: Table to delete from
+        delete:
+          example:
+            id: 4
+          $ref: '#/components/schemas/Proposition'
+          description: Conditions to match rows for deletion
+    KnnPropositionObject:
+      type: object
+      example:
+        k: 4
+        near:
+          tags: laptop
+      required:
+      - k
+      - near
+      properties:
+        k:
+          example: 4
+          type: integer
+          format: int32
+        near:
+          example:
+            tags: laptop
+          oneOf:
+          - $ref: '#/components/schemas/Proposition'
+          - $ref: '#/components/schemas/PrimitiveProposition'
+    ModPropositionArray:
+      example:
+      - 2
+      - 0
+      type: array
+      minItems: 2
+      maxItems: 2
+      items:
+        type: integer
+        format: int64
+    UserDefinedObjectInternalWrapper:
+      type: object
+      description: Any object which is valid according to the database schema.
+      oneOf:
+      - $ref: '#/components/schemas/UserDefinedObject'
+    BackfillOperation:
+      type: object
+      example:
+        backfill: users
+        columns:
+          tier:
+          - gold
+          - silver
+          - bronze
+        key: id
+        keys:
+        - 1
+        - 2
+        - 3
+      required:
+      - backfill
+      - key
+      - keys
+      - columns
+      properties:
+        backfill:
+          example: users
+          type: string
+          description: Table whose rows to update
+        key:
+          example: id
+          type: string
+          description: The business-key column used to match existing rows
+        keys:
+          example:
+          - 1
+          - 2
+          - 3
+          type: object
+          description: Array of key values, one per row to update
+        columns:
+          example:
+            tier:
+            - gold
+            - silver
+            - bronze
+          type: object
+          description: Column name -> array of new values, each array index-aligned to `keys`
+        upsert:
+          type: boolean
+          description: If true, insert a new row for a key that matches nothing (default false)
+          default: false
+    Lte:
+      example:
+        $lte: 8
+      examples:
+      - $lte: 8
+      - $lte: 0
+      - $lte: '20180502'
+      - from: products
+        where:
+          price:
+            $lte: 1
+      type: object
+      properties:
+        $lte:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    Has:
+      example:
+        $has: drink
+      examples:
+      - $has: drink
+      - from: products
+        where:
+          tags:
+            $has: drink
+      type: object
+      properties:
+        $has:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
     Not:
       example:
         $not:
@@ -1185,41 +1652,106 @@ components:
           oneOf:
           - $ref: '#/components/schemas/Proposition'
           - $ref: '#/components/schemas/PrimitiveProposition'
-    OptimizeOperation2:
-      type: object
+    ArrayValue:
+      oneOf:
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+      - type: object
+    Nn:
       example:
-        optimize: users
-      required:
-      - optimize
-      properties:
-        optimize:
-          example: users
-          type: string
-          description: Table to optimize
-    GetValueExpression:
-      example:
-        $get: query
+        $nn:
+        - tags: laptop
       examples:
-      - $get: query
-      - $get: click
-      - $get: product.title
+      - $nn:
+        - tags: laptop
+      - $nn:
+          near:
+            tags: laptop
       type: object
       properties:
-        $get:
-          type: string
+        $nn:
+          oneOf:
+          - $ref: '#/components/schemas/NnPropositionObject'
+          - $ref: '#/components/schemas/NnPropositionArray'
+    Sample:
+      example:
+        $sample: 100
+      examples:
+      - $sample: 100
+      - $sample:
+          n: 100
+          of:
+            app: X
+          seed: 0
+      - from: products
+        where:
+          $sample: 100
+      type: object
+      properties:
+        $sample:
+          oneOf:
+          - $ref: '#/components/schemas/SamplePropositionObject'
+          - $ref: '#/components/schemas/SamplePropositionNumber'
+    Lt:
+      example:
+        $lt: 4
+      examples:
+      - $lt: 4
+      - $lt: -12.1
+      - $lt: '20180502'
+      - from: products
+        where:
+          price:
+            $lt: 1.24
+      type: object
+      properties:
+        $lt:
+          oneOf:
+          - $ref: '#/components/schemas/GetValueExpression'
+          - type: integer
+            format: int32
+          - type: integer
+            format: int64
+          - type: number
+          - type: 'null'
+          - $ref: '#/components/schemas/ArrayValue'
+          - $ref: '#/components/schemas/ToString'
+          - type: boolean
+          - type: string
+          - $ref: '#/components/schemas/Json'
+    PropositionSet:
+      example: product.tags
+      examples:
+      - product.tags
+      - query
+      - product
+      - tags
+      oneOf:
+      - type: array
+        items:
+          $ref: '#/components/schemas/PropositionSet'
+      - type: string
+      - $ref: '#/components/schemas/Proposition'
   parameters:
-    JobId:
-      name: uuid
-      in: path
-      required: true
-      description: The assigned id of the operation
-      schema:
-        type: string
     Table:
       name: table
       in: path
       required: true
       description: The name of the table to add data to
+      schema:
+        type: string
+    JobId:
+      name: uuid
+      in: path
+      required: true
+      description: The assigned id of the operation
       schema:
         type: string
   securitySchemes:

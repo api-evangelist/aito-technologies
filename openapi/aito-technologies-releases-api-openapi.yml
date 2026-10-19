@@ -1,0 +1,104 @@
+openapi: 3.2.0
+info:
+  title: Aito Technologies Releases API
+security:
+- ApiKeyAuth: []
+tags:
+- name: Releases
+paths:
+  /api/v2/_releases:
+    get:
+      tags:
+      - Releases
+      description: List published releases. A release is an immutable, named snapshot of the database head; a tenant database can mount a shared repository by release version. A read API key is required.
+      operationId: v2-releases-list
+      responses:
+        200:
+          description: The list of releases
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  releases:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        hash:
+                          type: string
+      summary: V2 releases list
+      x-summary-source: derived
+    post:
+      tags:
+      - Releases
+      description: Publish the current head as a new immutable release. Republishing an existing release name is refused (a release is frozen). A read-write API key is required.
+      operationId: v2-releases-publish
+      requestBody:
+        required: true
+        description: The name of the release to publish.
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: The release name (e.g. v1, 2026-07)
+      responses:
+        200:
+          description: The published release
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  name:
+                    type: string
+                  hash:
+                    type: string
+        400:
+          description: Invalid name, or a release with that name already exists
+      summary: V2 releases publish
+      x-summary-source: derived
+  /api/v2/_releases/{name}:
+    delete:
+      tags:
+      - Releases
+      description: Retire (unpin) a release. Once retired, its head may be reclaimed by GC. A read-write API key is required.
+      operationId: v2-releases-retire
+      parameters:
+      - name: name
+        in: path
+        required: true
+        description: The release name
+        schema:
+          type: string
+      responses:
+        200:
+          description: Status of the retire
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  name:
+                    type: string
+        404:
+          description: No such release
+      summary: V2 releases retire
+      x-summary-source: derived
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

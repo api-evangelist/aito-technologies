@@ -1,0 +1,124 @@
+openapi: 3.2.0
+info:
+  title: Aito Technologies Refs API
+security:
+- ApiKeyAuth: []
+tags:
+- name: Refs
+paths:
+  /api/v2/_refs:
+    get:
+      tags:
+      - Refs
+      description: List every ref in the database — branches (envs, including the default master) and releases — in one uniform view with role, mutability and head hash. Read-only; writes use the branch (_envs) and release (_releases) endpoints. A read API key is required.
+      operationId: v2-refs-list
+      parameters:
+      - name: role
+        in: query
+        required: false
+        description: 'Filter by role: ''branch'' or ''release'''
+        schema:
+          type: string
+          enum:
+          - branch
+          - release
+      responses:
+        200:
+          description: The list of refs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        role:
+                          type: string
+                          enum:
+                          - branch
+                          - release
+                        mutable:
+                          type: boolean
+                        default:
+                          type: boolean
+                          description: Present and true for the default (master) branch
+                        head:
+                          type: string
+                          description: Content hash of the ref's committed head
+      summary: V2 refs list
+      x-summary-source: derived
+  /api/v2/_refs/{name}:
+    put:
+      tags:
+      - Refs
+      description: Create or move a ref — generic write plumbing (v2 only). A release is immutable (publishing over an existing one is refused); moving an existing branch requires force=true; protected refs (system, _*) cannot be written. A read-write API key is required.
+      operationId: v2-refs-put
+      parameters:
+      - name: name
+        in: path
+        required: true
+        description: The ref (e.g. 'sandbox', 'release.v1'; 'main' aliases the default branch)
+        schema:
+          type: string
+      - name: force
+        in: query
+        required: false
+        description: Allow moving an existing (mutable) branch
+        schema:
+          type: boolean
+      requestBody:
+        required: false
+        description: The source ref to copy or freeze from.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                from:
+                  type: string
+                  description: Source branch (for a branch), or 'main' for a release
+      responses:
+        200:
+          description: The created or moved ref
+        400:
+          description: Invalid ref or source
+        403:
+          description: The ref is protected
+        409:
+          description: The ref is an immutable release, or exists and force was not set
+      summary: V2 refs put
+      x-summary-source: derived
+    delete:
+      tags:
+      - Refs
+      description: Delete a branch or retire a release (v2 only). The master branch and protected refs cannot be deleted. A read-write API key is required.
+      operationId: v2-refs-delete
+      parameters:
+      - name: name
+        in: path
+        required: true
+        description: The ref to delete
+        schema:
+          type: string
+      responses:
+        200:
+          description: Status of the delete
+        400:
+          description: Cannot delete the master branch
+        403:
+          description: The ref is protected
+        404:
+          description: No such ref
+      summary: V2 refs delete
+      x-summary-source: derived
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

@@ -1,0 +1,60 @@
+openapi: 3.2.0
+info:
+  title: Aito Technologies Introspection API
+  description: Build and capability introspection — which core build answered, and which operators are live
+security:
+- ApiKeyAuth: []
+tags:
+- name: introspection
+  description: Build and capability introspection — which core build answered, and which operators are live
+paths:
+  /api/v2/_version:
+    get:
+      tags:
+      - introspection
+      description: The running core build. `version` is the human-meaningful release id — `X.Y.Z` on a release build, `X.Y.Z-dev+` otherwise — while `gitRevision` and `builtAt` carry exact provenance. A read API key is enough. Lets a caller record which build answered a request — and diff a deployment that changed a result underneath them.
+      operationId: v2-version
+      responses:
+        200:
+          description: The BuildInfo of the running server.
+          content:
+            application/json:
+              schema:
+                type: object
+      summary: V2 version
+      x-summary-source: derived
+  /api/v2/_ops:
+    get:
+      tags:
+      - introspection
+      description: The live operator inventory — every query operator this build supports, each with a one-line context description, from the single source of truth the Query Reference is generated from. Lets a client render the capability set instead of hard-coding it. A read API key is enough.
+      operationId: v2-ops
+      responses:
+        200:
+          description: The operator inventory.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count:
+                    type: integer
+                  operators:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        token:
+                          type: string
+                          example: $has
+                        context:
+                          type: string
+                          example: 'where: token / membership'
+      summary: V2 ops
+      x-summary-source: derived
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

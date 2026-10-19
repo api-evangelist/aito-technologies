@@ -1,26 +1,30 @@
 {
   "provider": "aito-technologies",
   "sources": [
-    "_original/aito-technologies-openapi-original.yml"
+    "_original/aito-technologies-openapi.yml"
   ],
   "outputs": [
     "aito-technologies-data-api-openapi.yml",
+    "aito-technologies-envs-api-openapi.yml",
+    "aito-technologies-introspection-api-openapi.yml",
+    "aito-technologies-jobs-api-openapi.yml",
     "aito-technologies-query-api-openapi.yml",
+    "aito-technologies-refs-api-openapi.yml",
+    "aito-technologies-releases-api-openapi.yml",
     "aito-technologies-schema-api-openapi.yml"
   ],
   "archived": [],
   "errors": [
-    "aito-technologies-openapi-original.yml: missing info object"
+    "aito-technologies-openapi.yml: missing info object"
   ],
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
-    "aito-technologies-openapi-original.yml: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
-    "apis.yml register: already-registered"
+    "aito-technologies-openapi.yml: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "aito-technologies-openapi.yml: declared missing tag: envs",
+    "aito-technologies-openapi.yml: declared missing tag: refs",
+    "aito-technologies-openapi.yml: declared missing tag: releases",
+    "apis.yml register: written (+5 apis, 8 total)"
   ],
-  "skipped": [
-    "aito-technologies-data-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "aito-technologies-query-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "aito-technologies-schema-api-openapi.yml: previously refined output, superseded by openapi/_original/"
-  ]
+  "skipped": []
 }

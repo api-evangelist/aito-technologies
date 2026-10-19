@@ -1,0 +1,261 @@
+openapi: 3.2.0
+info:
+  title: Aito Technologies Jobs API
+  description: Asynchronous jobs — submit long operations and poll for status/result
+security:
+- ApiKeyAuth: []
+tags:
+- name: Jobs
+  description: Asynchronous jobs — submit long operations and poll for status/result
+paths:
+  /api/v2/jobs/_evaluate:
+    post:
+      tags:
+      - Jobs
+      description: 'Submit an operation as an ASYNCHRONOUS job instead of holding it open on one HTTP request. Returns 201 Created with a JobDescription (id, path, startedAt); poll GET /api/v2/jobs/{id} for status and GET /api/v2/jobs/{id}/result for the result. This is the escape hatch for operations that can exceed the 15-minute request timeout — notably _evaluate on a rep2 collection, which runs with no maxTime budget. The same jobs/ prefix works for EVERY v2 op: query ops (jobs/_query, jobs/_search, jobs/_predict, jobs/_recommend, jobs/_relate, jobs/_evaluate, jobs/_aggregate, jobs/_estimate, jobs/_match, jobs/_batch, jobs/_sql) and write ops (jobs/data/{table}/batch, jobs/data/{table}/stream, jobs/data/{table}/optimize, jobs/data/_delete, jobs/data/_modify, jobs/data/{table} …).'
+      operationId: v2-jobs-submit
+      requestBody:
+        required: true
+        description: The same body the synchronous endpoint takes (here, an evaluate query).
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/V2Query'
+      responses:
+        201:
+          description: Job accepted; the body is a JobDescription carrying the job id.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDescription'
+        400:
+          description: Invalid query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      summary: V2 jobs submit
+      x-summary-source: derived
+  /api/v2/jobs:
+    get:
+      tags:
+      - Jobs
+      description: List the jobs (running and recently finished) on this server. Jobs are shared across API versions, so a job submitted via /api/v1/jobs or /api/v2/jobs appears here.
+      operationId: v2-jobs-list
+      responses:
+        200:
+          description: An array of JobDescriptions.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobDescription'
+      summary: V2 jobs list
+      x-summary-source: derived
+  /api/v2/jobs/{id}:
+    get:
+      tags:
+      - Jobs
+      description: Job status. While running, returns the JobDescription; once finished it adds a 'status' field ('ok' or 'failed'), and a failed job also carries an 'error' message. The same id is addressable under /api/v1/jobs/{id}.
+      operationId: v2-jobs-status
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The job id returned by the submit call.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: The job status.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobDescription'
+        404:
+          description: Unknown job id.
+      summary: V2 jobs status
+      x-summary-source: derived
+    delete:
+      tags:
+      - Jobs
+      description: Request cancellation of a running job. Cancellation interrupts the worker; cooperative operations (e.g. _evaluate) stop at the next checkpoint and finish as cancelled. A job that has already finished returns status 'not_running'.
+      operationId: v2-jobs-cancel
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The job id to cancel.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: Cancellation acknowledged ('cancelling'), or a no-op on a finished job ('not_running').
+        404:
+          description: Unknown job id.
+      summary: V2 jobs cancel
+      x-summary-source: derived
+  /api/v2/jobs/{id}/result:
+    get:
+      tags:
+      - Jobs
+      description: The job's result. Once the job has finished this is byte-identical to the synchronous endpoint's response. Returns 202 Accepted while the job is still running; a failed job returns its error.
+      operationId: v2-jobs-result
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: The job id.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: The finished job's result (the same body the synchronous endpoint returns).
+        202:
+          description: The job is still running; poll again.
+        404:
+          description: Unknown job id.
+      summary: V2 jobs result
+      x-summary-source: derived
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      description: The v2 structured error body. Present whenever a request fails; `kind` is the literal string `error`. Branch on `data.code`, not on the HTTP status or the message text.
+      properties:
+        kind:
+          type: string
+          enum:
+          - error
+          example: error
+        data:
+          type: object
+          properties:
+            code:
+              type: string
+              description: 'Stable machine-readable error code. Query/read endpoints: query.invalid, request.invalid, proposition.unsupported (400), not_found (404), operation.unsupported (501), json.malformed (400), internal (500). Data/schema endpoints add data.bad_request, import.failed, table.exists, schema.not_collection, schema.create_failed, schema.column_update_failed, schema.refresh_failed, schema.plan_failed, schema.apply_failed (400).'
+              example: not_found
+            message:
+              type: string
+              description: Human-readable, single-line explanation. Surface it; do not parse it.
+              example: Unknown table 'invoicess'
+          required:
+          - code
+          - message
+      required:
+      - kind
+      - data
+    V2Query:
+      type: object
+      required:
+      - from
+      description: 'A v2 (Query2 engine) query. The same from/where evidence drives plain queries, predictions, recommendations and relation analysis, selected by which of predict / recommend / relate / search is present. See the v2 Query Operator Reference guide for the full where/orderBy/select grammar.
+
+        '
+      properties:
+        from:
+          type: string
+          description: The table (collection) to query.
+        where:
+          type: object
+          description: 'Filter / evidence conditions. A field-value pair is equality (e.g. category = books). Operators inside a field: $has, $match (text), $exact, $gt / $gte / $lt / $lte, $mod, $exists, and $numeric (adaptive neighbourhood binning). Top-level logical combinators: $and, $or, $not (each over nested where-objects), and $on (observe a condition only where another holds).
+
+            '
+        predict:
+          type: string
+          description: Field to predict — ranks its values by probability given the where evidence.
+        recommend:
+          type: string
+          description: Link field to recommend on. Like predict, paired with goal.
+        goal:
+          type: object
+          description: 'Desired outcome for recommend — a where-style object, e.g. purchase = true. The recommendation ranks candidates by the probability of this goal.
+
+            '
+        relate:
+          type: array
+          items:
+            type: string
+          description: Fields to find statistical relations for. Returns relation statistics, not rows.
+        search:
+          type: object
+          description: 'Text search sugar — an object with field and text keys; equivalent to a where + predict on that text field.
+
+            '
+        basedOn:
+          type: array
+          items:
+            type: string
+          description: Linked-table fields to project into the prediction context as cross-table evidence.
+        orderBy:
+          description: 'Result ordering. A field name; the string $p to rank by prediction probability; or an object of the form $p over a $context where- object to rank candidates by the probability of a condition evaluated against the context (from) table. The object form with field and desc keys sorts a plain field.
+
+            '
+          oneOf:
+          - type: string
+          - type: object
+        select:
+          description: 'Fields to include per hit. Besides column names, predictive queries expose computed columns: $value (the candidate value), $p (its probability), and $why (the explanation factor tree — base probability times related-proposition lifts times normalizers).
+
+            '
+          oneOf:
+          - type: array
+            items:
+              type: string
+          - type: string
+        having:
+          type: object
+          description: 'Candidate filter on the per-candidate frequency $f. Only the form {"$f": {"$gte"|"$gt"|"$lte"|"$lt": <number>}} is accepted, on a predict/recommend/get candidate query. {"$f": {"$gte": 1}} keeps only values that actually co-occur with the where — the server-side tenant-scoping idiom (where supplies evidence, not an output domain). Applied after ranking, before offset/limit; no renormalisation.
+
+            '
+        config:
+          type: object
+          description: 'Per-query inference configuration, e.g. an ai key selecting an inference profile.
+
+            '
+        offset:
+          type: integer
+          description: 'Number of results to skip (default: 0).'
+        limit:
+          type: integer
+          description: 'Maximum number of results to return (default: 10).'
+    JobDescription:
+      type: object
+      description: A handle to an asynchronous job. Returned by a jobs submit (201) and by the status/list endpoints. `finishedAt`, `status` and `error` appear only after the job completes.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The job id; address it at /api/v2/jobs/{id}.
+        path:
+          type: string
+          description: The operation label (e.g. 'Evaluate', 'Batch insert').
+          example: Evaluate
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+          description: Present once the job has finished.
+        status:
+          type: string
+          enum:
+          - ok
+          - failed
+          description: 'Present once finished: ''ok'', or ''failed'' with an ''error''.'
+        error:
+          type: string
+          description: Present when status is 'failed'.
+      required:
+      - id
+      - startedAt
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key

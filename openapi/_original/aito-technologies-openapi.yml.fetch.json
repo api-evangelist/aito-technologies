@@ -1,0 +1,12 @@
+{
+ "url": "https://aito.ai/docs/api/openapi.yaml",
+ "final": "https://aito.ai/docs/api/openapi.yaml",
+ "status": 200,
+ "content_type": "application/yaml",
+ "bytes": 232243,
+ "sha256": "bc722802f89fd116537db4464d31624bd0a153828b3be16c33901ea31423f014",
+ "fetched_at": "2026-10-19",
+ "fetched_by": "APIEvangelist-Harvest/1.0 (+https://apievangelist.com)",
+ "match": "byte-identical",
+ "note": "re-archived: the provider's current document replaced a stale archive (roadmap#793); the old files are in openapi/_superseded/2026-10-19-stale"
+}

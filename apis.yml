@@ -116,6 +116,57 @@ apis:
     url: https://aito.ai/docs/api/
   - type: Authentication
     url: authentication/aito-technologies-authentication.yml
+- aid: aito-technologies:aito-technologies-envs-api
+  name: Aito Technologies Envs API
+  description: The envs API from Aito Technologies — 3 operation(s) for envs.
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - envs
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-envs-api-openapi.yml
+- aid: aito-technologies:aito-technologies-introspection-api
+  name: Aito Technologies Introspection API
+  description: >-
+    Build and capability introspection — which core build answered, and which operators are live
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - introspection
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-introspection-api-openapi.yml
+- aid: aito-technologies:aito-technologies-jobs-api
+  name: Aito Technologies Jobs API
+  description: Asynchronous jobs — submit long operations and poll for status/result
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - jobs
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-jobs-api-openapi.yml
+- aid: aito-technologies:aito-technologies-refs-api
+  name: Aito Technologies Refs API
+  description: The refs API from Aito Technologies — 2 operation(s) for refs.
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - refs
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-refs-api-openapi.yml
+- aid: aito-technologies:aito-technologies-releases-api
+  name: Aito Technologies Releases API
+  description: The releases API from Aito Technologies — 2 operation(s) for releases.
+  humanURL: https://aito.ai/docs/api/
+  baseURL: https://shared.aito.ai
+  tags:
+  - releases
+  properties:
+  - type: OpenAPI
+    url: openapi/aito-technologies-releases-api-openapi.yml
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
