@@ -133,6 +133,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Introspection
+  tags_raw:
   - introspection
   properties:
   - type: OpenAPI
@@ -143,6 +145,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Job
+  tags_raw:
   - jobs
   properties:
   - type: OpenAPI
@@ -153,6 +157,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Refs
+  tags_raw:
   - refs
   properties:
   - type: OpenAPI
@@ -163,6 +169,8 @@ apis:
   humanURL: https://aito.ai/docs/api/
   baseURL: https://shared.aito.ai
   tags:
+  - Releases
+  tags_raw:
   - releases
   properties:
   - type: OpenAPI
